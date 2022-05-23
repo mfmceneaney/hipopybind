@@ -113,16 +113,22 @@ class CMakeBuild(build_ext):
         subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=build_temp)
         subprocess.check_call(["cmake", "--build", "."] + build_args, cwd=build_temp)
 
+#NOTE: Define function for reading README file into long description
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="hipopybind",
-    version="0.0.1",
+    version="0.0.3",
     author="Matthew McEneaney",
     author_email="matthew.mceneaney@duke.edu",
     license="MIT",
-    description="A HIPO python library using pybind11 and CMake",
-    long_description="",
+    url="https://github.com/mfmceneaney/hipopybind.git",
+    description="A HIPO python library using PyBind11 and CMake",
+    long_description=read('README.md'),
+    long_description_content_type='text/markdown',
     ext_modules=[CMakeExtension("hipopybind")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
