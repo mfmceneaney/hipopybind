@@ -19,6 +19,7 @@ add_subdirectory(pybind11)
 #-----------------------------------------#
 file (GLOB SOURCE_FILES "hipo/hipo4/*.cpp")
 file (GLOB HEADER_FILES "hipo/hipo4/*.h")
+file (GLOB SHARED_FILES "hipo/*.a")
 file (GLOB PYTHON_FILES "src/*.cpp" "src/*.h")
 file (GLOB LZ4SRC_FILES "hipo/lz4/lib/*.c")
 file (GLOB LZ4HDR_FILES "hipo/lz4/lib/*.h")
