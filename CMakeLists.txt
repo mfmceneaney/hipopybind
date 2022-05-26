@@ -6,15 +6,15 @@ project(hipopybind)
 #-----------------------------------------#
 # Add LZ4 dependency
 add_compile_definitions(__LZ4__)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/hipo/lz4/lib)
+include_directories(${CMAKE_SOURCE_DIR}/hipo/lz4/lib)
 
 #-----------------------------------------#
 # Add HIPO dependency
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/hipo)
+add_subdirectory(${CMAKE_SOURCE_DIR}/hipo)
 
 #-----------------------------------------#
 # Add pybind11 dependency and module
-add_subdirectory(pybind11)
+add_subdirectory(${CMAKE_SOURCE_DIR}/pybind11)
 
 #-----------------------------------------#
 file (GLOB SOURCE_FILES "hipo/hipo4/*.cpp")
@@ -38,4 +38,4 @@ target_compile_definitions(hipopybind
 
 #-----------------------------------------#
 # Link header files from subdirectories
-target_include_directories(hipopybind PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(hipopybind PUBLIC ${CMAKE_SOURCE_DIR})
