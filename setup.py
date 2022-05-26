@@ -62,7 +62,7 @@ class CMakeBuild(build_ext):
             # exported for Ninja to pick it up, which is a little tricky to do.
             # Users can override the generator with CMAKE_GENERATOR in CMake
             # 3.15+.
-            if not cmake_generator:
+            if not cmake_generator and not sys.platform.startswith('linux'): #NOTE: #DEBUGGING: ADDED FOR BUILD TO WORK ON IFARM
                 try:
                     import ninja  # noqa: F401
 
@@ -121,7 +121,7 @@ def read(fname):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="hipopybind",
-    version="0.0.4",
+    version="0.0.5",
     author="Matthew McEneaney",
     author_email="matthew.mceneaney@duke.edu",
     license="MIT",
