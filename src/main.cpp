@@ -327,6 +327,15 @@ PYBIND11_MODULE(hipopybind, m) {
     bank.def("getDouble", py::detail::overload_cast_impl<const char*, int>()(&hipo::bank::getDouble, py::const_), "getDouble");
     bank.def("getLong", py::detail::overload_cast_impl<int, int>()(&hipo::bank::getLong, py::const_), "getLong");
     bank.def("getLong", py::detail::overload_cast_impl<const char*, int>()(&hipo::bank::getLong, py::const_), "getLong");
+
+    bank.def("getInts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getInts, py::const_), "getInts");
+    bank.def("getShorts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getShorts, py::const_), "getShorts");
+    bank.def("getBytes", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getBytes, py::const_), "getBytes");
+    bank.def("getFloats", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getFloats, py::const_), "getFloats");
+    bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
+    bank.def("getLongs", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getLongs, py::const_), "getLongs");
+
+    bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
     
     bank.def("putInt", py::detail::overload_cast_impl<int, int, int32_t>()(&hipo::bank::putInt), "putInt");
     bank.def("putInt", py::detail::overload_cast_impl<const char*, int, int32_t>()(&hipo::bank::putInt), "putInt");
@@ -340,6 +349,13 @@ PYBIND11_MODULE(hipopybind, m) {
     bank.def("putDouble", py::detail::overload_cast_impl<const char*, int, double>()(&hipo::bank::putDouble), "putDouble");
     bank.def("putLong", py::detail::overload_cast_impl<int, int, int64_t>()(&hipo::bank::putLong), "putLong");
     bank.def("putLong", py::detail::overload_cast_impl<const char*, int, int64_t>()(&hipo::bank::putLong), "putLong");
+
+    bank.def("putInts", py::detail::overload_cast_impl<const char*, std::vector<int32_t>>()(&hipo::bank::putInts), "putInts");
+    bank.def("putShorts", py::detail::overload_cast_impl<const char*, std::vector<int16_t>>()(&hipo::bank::putShorts), "putShorts");
+    bank.def("putBytes", py::detail::overload_cast_impl<const char*, std::vector<int8_t>>()(&hipo::bank::putBytes), "putBytes");
+    bank.def("putFloats", py::detail::overload_cast_impl<const char*, std::vector<float>>()(&hipo::bank::putFloats), "putFloats");
+    bank.def("putDoubles", py::detail::overload_cast_impl<const char*, std::vector<double>>()(&hipo::bank::putDoubles), "putDoubles");
+    bank.def("putLongs", py::detail::overload_cast_impl<const char*, std::vector<int64_t>>()(&hipo::bank::putLongs), "putLongs");
 
     bank.def("show", &hipo::bank::show);
     bank.def("reset", &hipo::bank::reset);
