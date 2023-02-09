@@ -61,6 +61,7 @@ class HipoFileIterator {
         std::map<std::string, int> item_type_map;
         std::string separator;
         std::vector<int> item_indices;
+        std::vector<int> tags;
 
     protected:
         void protected_method();
@@ -69,7 +70,8 @@ class HipoFileIterator {
         HipoFileIterator(
             std::vector<std::string> &__filenames__,
             std::vector<std::string> &__banknames__,
-            int __batchsize__
+            int __batchsize__,
+            std::vector<int> &__tags__
             ){
             filenames = __filenames__;
             banknames = __banknames__;
@@ -77,6 +79,7 @@ class HipoFileIterator {
             batchsize = __batchsize__;
             separator = "_";
             item_indices = std::vector<int>(9); //NOTE: Only 6 types, but they only go up to 8 and it's easier to use the type int as the index.
+            tags = __tags__;
 
             // Check length of filenames
             if (filenames.size()==0) throw std::invalid_argument("HipoFileIterator: length of filenames must be > 0");
@@ -85,6 +88,9 @@ class HipoFileIterator {
             if (batchsize<=0) throw std::invalid_argument("HipoFileIterator: batch_size must be > 0");
 
             index = 0;
+
+            // Set tags before opening files
+            for (int i=0; i<tags.size(); i++) { reader.setTags(tags.at(i)); }
             
             // Open first file and set bank names to all banks if none specified
             open();
@@ -168,6 +174,22 @@ class HipoFileIterator {
         }
 
         /**
+        * Add a reader tag.
+        * @param int tag
+        */
+        void setTags(int tag) {
+            reader.setTags(tag);
+        }
+
+        /**
+        * Get reader tags.
+        * @return std::vector<int> tags
+        */
+        std::vector<int> getTags() {
+            return tags;
+        }
+
+        /**
         * Recursive function which loops file(s) to read data into next batch.
         * @param int __counter__
         * @return bool
@@ -216,7 +238,7 @@ class HipoFileIterator {
             // Move on to next file if batch is not yet complete
             if (counter<batchsize) {
                 if (open()) next(counter); //NOTE: Recursive function
-                else throw pybind11::stop_iteration("");//NOTE: NOT YET TESTED
+                // else throw pybind11::stop_iteration("");//NOTE: NOT YET TESTED //TODO: NOTE: THIS SHOULD NOT RAISE A STOP ITERATION BECAUSE YOU STILL NEED TO GET THE BATCH DATA IN PYTHON
             }
             return false; //NOTE: Only happens if you've reached the end of all files.
         } //TODO
@@ -387,11 +409,12 @@ PYBIND11_MODULE(hipopybind, m) {
     //----------------------------------------------------------------------//
     // Bind HipoFileIterator
     py::class_<HipoFileIterator, PyHipoFileIterator<>> hipofileiterator(m, "HipoFileIterator");
-    hipofileiterator.def(py::init([](std::vector<std::string> & filenames, std::vector<std::string> & banknames, int batchsize) { return new HipoFileIterator(filenames,banknames,batchsize); }));
+    hipofileiterator.def(py::init([](std::vector<std::string> & filenames, std::vector<std::string> & banknames, int batchsize, std::vector<int> & tags) { return new HipoFileIterator(filenames,banknames,batchsize,tags); }));
     hipofileiterator.def("open", &HipoFileIterator::open);
     hipofileiterator.def("reset", &HipoFileIterator::reset);
     hipofileiterator.def("next", &HipoFileIterator::next);
     hipofileiterator.def("gotoEvent", &HipoFileIterator::gotoEvent);
+    hipofileiterator.def("setTags", &HipoFileIterator::setTags); //TODO: ADD OPTION IN INIT TO SET TAGS...
     hipofileiterator.def("getType", &HipoFileIterator::getType);
     hipofileiterator.def("getDoubles", &HipoFileIterator::getDoubles);
     hipofileiterator.def("getFloats", &HipoFileIterator::getFloats);
@@ -411,6 +434,7 @@ PYBIND11_MODULE(hipopybind, m) {
     hipofileiterator.def_property_readonly("reader",&HipoFileIterator::getReader);
     hipofileiterator.def_property_readonly("dict",&HipoFileIterator::getDict);
     hipofileiterator.def_property_readonly("event",&HipoFileIterator::getEvent);
+    hipofileiterator.def_property_readonly("tags",&HipoFileIterator::getTags);
 
     hipofileiterator.def("__repr__", //TODO: Test this function in python
         [](HipoFileIterator &hfi) { std::string r("HipoFileIterator"); return r; }
