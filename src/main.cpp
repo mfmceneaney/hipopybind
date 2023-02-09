@@ -1,8 +1,17 @@
+#include <iostream>
+#include <string>
+#include <array>
+#include <vector>
+#include <map>
+#include <stdexcept>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 #include <pybind11/chrono.h>
+#include <pybind11/stl_bind.h>
+#include <pybind11/iostream.h>
 
 #include <hipo/hipo4/utils.h>
 #include <hipo/hipo4/datastream.h>
@@ -21,6 +30,297 @@
 //NOTE: Shared object will not load if you simultaneously 
 // define classes to bind within this file and bind hipo 
 // classes or classes from another cpp project.
+
+//--------------------------------------------------//
+// Custom classes
+
+class HipoFileIterator {
+
+    private:
+        int batchsize;
+        int nbanks;
+        int index;
+        std::vector<std::string> filenames;
+        std::vector<std::string> banknames;
+        std::vector<hipo::bank>  banklist;
+        std::vector<std::vector<int>> typelist;
+        std::vector<std::vector<std::string>> itemlist;
+        hipo::reader reader;
+        // hipo::writer writer;
+        hipo::dictionary dict;
+        hipo::event event;
+
+        std::vector<std::vector<std::vector<double>>>  vec_double;
+        std::vector<std::vector<std::vector<float>>>   vec_float;
+        std::vector<std::vector<std::vector<int>>> vec_int;
+        std::vector<std::vector<std::vector<long>>> vec_long;
+        std::vector<std::vector<std::vector<int>>> vec_short;
+        std::vector<std::vector<std::vector<int>>>  vec_byte;
+
+        std::map<std::string, int> item_index_map;
+        std::map<std::string, int> item_type_map;
+        std::string separator;
+        std::vector<int> item_indices;
+
+    protected:
+        void protected_method();
+
+    public:
+        HipoFileIterator(
+            std::vector<std::string> &__filenames__,
+            std::vector<std::string> &__banknames__,
+            int __batchsize__
+            ){
+            filenames = __filenames__;
+            banknames = __banknames__;
+            nbanks = banknames.size();
+            batchsize = __batchsize__;
+            separator = "_";
+            item_indices = std::vector<int>(9); //NOTE: Only 6 types, but they only go up to 8 and it's easier to use the type int as the index.
+
+            // Check length of filenames
+            if (filenames.size()==0) throw std::invalid_argument("HipoFileIterator: length of filenames must be > 0");
+
+            // Check batchsize
+            if (batchsize<=0) throw std::invalid_argument("HipoFileIterator: batch_size must be > 0");
+
+            index = 0;
+            
+            // Open first file and set bank names to all banks if none specified
+            open();
+            if (nbanks==0) {
+                banknames = dict.getSchemaList();
+                nbanks = banknames.size();
+            }
+
+            // Loop bank names and create banks and get entry names and types
+            typelist = std::vector<std::vector<int>>(0);
+            itemlist = std::vector<std::vector<std::string>>(0);
+            for (int i = 0; i<nbanks; i++) {
+                const char * bankname = banknames.at(i).c_str();
+                hipo::schema &schema = dict.getSchema(bankname);
+                hipo::bank bank = hipo::bank(schema);
+                banklist.push_back(bank);
+                event.getStructure(bank);
+
+                // Loop bank entries and get names and types
+                int nentries = schema.getEntries();
+                std::vector<int> vec_entrytype = std::vector<int>(0);
+                std::vector<std::string> vec_entryname = std::vector<std::string>(0); //NOTE: IMPORTANT THAT THIS IS ZERO.  IF YOU SET TO NENTRIES YOU MESS UP PUSHBACK AND GET A VECTOR TWICE AS LONG AS YOU WANT.
+                for (int j = 0; j<nentries; j++) {
+                    int entrytype = schema.getEntryType(j);
+                    std::string entryname = schema.getEntryName(j);
+                    vec_entrytype.push_back(entrytype);
+                    vec_entryname.push_back(entryname);
+
+                    // Update bank+item to index map
+                    item_index_map.insert(std::make_pair(bankname+separator+entryname,item_indices[entrytype]));
+                    item_type_map.insert(std::make_pair(bankname+separator+entryname,entrytype));
+                    item_indices.at(entrytype) = item_indices.at(entrytype)+1;
+                }
+                typelist.push_back(vec_entrytype);
+                itemlist.push_back(vec_entryname);
+            }
+            reset();
+
+        } // HipoFileIterator() //NOTE: //TODO: Could also define a init method where you specify bank entries and then parse in python... and could also figure out how to include cuts....
+
+        virtual ~HipoFileIterator() = default;
+
+        /**
+        * Open the next file in this.filenames if the end of this.filenames has not yet been reached.
+        * @return bool
+        */
+        bool open() {  //TODO: Check inline is beneficial here.
+            if (index>=filenames.size()) return false;
+            const char * filename = filenames.at(index).c_str();
+            reader.open(filename);
+            reader.readDictionary(dict); //TODO: Figure out how to check file here....
+            index++;
+            return true;
+        }
+
+        /**
+        * Resets the vectors used for storing batch data of all available types.
+        * @exception std::out_of_range
+        */
+        void reset() {
+            try {
+                vec_double = std::vector<std::vector<std::vector<double>>>(item_indices.at(5));
+                vec_float = std::vector<std::vector<std::vector<float>>>(item_indices.at(4));
+                vec_int = std::vector<std::vector<std::vector<int>>>(item_indices.at(3));
+                vec_long = std::vector<std::vector<std::vector<long>>>(item_indices.at(8));
+                vec_short = std::vector<std::vector<std::vector<int>>>(item_indices.at(2));
+                vec_byte = std::vector<std::vector<std::vector<int>>>(item_indices.at(1));
+            } catch(const std::out_of_range &e) {
+                 std::cout << e.what() <<std::endl;//DEBUGGING
+            }
+            return;
+        }
+
+        /**
+        * Move reader to given event number in file.
+        * @param int n
+        * @return bool
+        */
+        bool gotoEvent(int n) { //TODO: CHECK THIS METHOD AND DO A REWIND METHOD TOO.
+            return reader.gotoEvent(n);
+        }
+
+        /**
+        * Recursive function which loops file(s) to read data into next batch.
+        * @param int __counter__
+        * @return bool
+        */
+        bool next(int __counter__ = 0) {
+
+            int counter = __counter__;
+
+            // Loop events
+            while (reader.next()) {
+                reader.read(event);
+
+                // Loop banks
+                for (int i = 0; i<nbanks; i++) {
+
+                    // Read bank
+                    std::string bankname = banknames.at(i);
+                    hipo::bank bank = banklist.at(i);
+                    event.getStructure(bank);
+
+                    // Get entry names and types
+                    std::vector<int> entrytypes = typelist.at(i);
+                    std::vector<std::string> entrynames = itemlist.at(i); //TODO: COULD ALSO COMPARE TIME WITH SCHEMALIST...
+                    int nentries = entrytypes.size();
+
+                    // Loop entries
+                    for (int j = 0; j<nentries; j++) {
+                        int type = entrytypes.at(j);
+                        const char * name = entrynames.at(j).c_str();
+                        int entryindex = item_index_map.at(bankname+separator+name);
+                        switch(type) {
+                            case 1: vec_byte.at(entryindex).push_back(bank.getBytes(name)); break; //NOTE COULD INSERT INTO PREEXISTING VECTOR?  AND THEN INITIALIZE VECTOR WITH CORRECT DIMENSIONS ON FIRST TWO AXES...
+                            case 2: vec_short.at(entryindex).push_back(bank.getShorts(name)); break; //TODO: ALSO NEED TO DEAL WITH CASE WHERE SOME EVENTS DON'T HAVE ALL THE BANKS.
+                            case 3: vec_int.at(entryindex).push_back(bank.getInts(name)); break; //TODO: Make sure this will modify in place.
+                            case 4: vec_float.at(entryindex).push_back(bank.getFloats(name)); break; //TODO: Figure out how to add empty events for banks that don't occur in a given event... -> GetDoubles etc should return empty array if bank is empty in event and schema is still there so this should be fine, in principle.
+                            case 5: vec_double.at(entryindex).push_back(bank.getDoubles(name)); break;
+                            case 8: vec_long.at(entryindex).push_back(bank.getLongs(name)); break;
+                            default: throw pybind11::type_error("HipoFileIterator: Invalid type int for entry: "+entrynames.at(j)+"\n");
+                        }
+                    } // for (int j = 0; j<nentries; j++)
+
+                } // for (int i = 0; i<nbanks; i++)
+                counter++;
+                if (counter>=batchsize) return true;
+            }
+            // Move on to next file if batch is not yet complete
+            if (counter<batchsize) {
+                if (open()) next(counter); //NOTE: Recursive function
+                else throw pybind11::stop_iteration("");//NOTE: NOT YET TESTED
+            }
+            return false; //NOTE: Only happens if you've reached the end of all files.
+        } //TODO
+
+        /**
+        * Get type int for given bank name and entry name.
+        * @param std::string bankname
+        * @param std::string item
+        * @return int i
+        */
+        int getType(std::string bankname, std::string item) {
+            return item_type_map.at(bankname+separator+item); //NOTE: //TODO: COULD ADD pybind11::attribute_error here and try block.
+        }
+
+        /**
+        * Get batch array of doubles for given bank name and entry name.
+        * @param std::string bankname
+        * @param std::string item
+        * @return std::vector<std::vector<double>>
+        */
+        std::vector<std::vector<double>> getDoubles(std::string bankname, std::string item) const noexcept { //TODO: Check speed with these methods as inline.
+            int i = item_index_map.at(bankname+separator+item);
+            return vec_double.at(i);
+        }
+
+        /**
+        * Get batch array of floats for given bank name and entry name.
+        * @param std::string bankname
+        * @param std::string item
+        * @return std::vector<std::vector<float>>
+        */
+        std::vector<std::vector<float>> getFloats(std::string bankname, std::string item) const noexcept {
+            int i = item_index_map.at(bankname+separator+item);
+            return vec_float.at(i);
+        }
+
+        /**
+        * Get batch array of ints for given bank name and entry name.
+        * @param std::string bankname
+        * @param std::string item
+        * @return std::vector<std::vector<int>>
+        */
+        std::vector<std::vector<int>> getInts(std::string bankname, std::string item) const noexcept {
+            int i = item_index_map.at(bankname+separator+item);
+            return vec_int.at(i);
+        }
+
+        /**
+        * Get batch array of longs for given bank name and entry name.
+        * @param std::string bankname
+        * @param std::string item
+        * @return std::vector<std::vector<long>>
+        */
+        std::vector<std::vector<long>> getLongs(std::string bankname, std::string item) const noexcept {
+            int i = item_index_map.at(bankname+separator+item);
+            return vec_long.at(i);
+        }
+
+        /**
+        * Get batch array of shorts for given bank name and entry name.
+        * @param std::string bankname
+        * @param std::string item
+        * @return std::vector<std::vector<int>>
+        */
+        std::vector<std::vector<int>> getShorts(std::string bankname, std::string item) const noexcept {
+            int i = item_index_map.at(bankname+separator+item);
+            return vec_short.at(i);
+        }
+
+        /**
+        * Get batch array of bytes for given bank name and entry name.
+        * @param std::string bankname
+        * @param std::string item
+        * @return std::vector<std::vector<int>>
+        */
+        std::vector<std::vector<int>> getBytes(std::string bankname, std::string item) const noexcept {
+            int i = item_index_map.at(bankname+separator+item);
+            return vec_byte.at(i);
+        }
+
+        /*
+        * Get methods for class attributes
+        */
+        int getBatchsize() { return batchsize; }
+        int getNBanks()    { return nbanks;    }
+        int getIndex()     { return index;     }
+        std::vector<std::string> getFilenames() { return filenames; }
+        std::vector<std::string> getBanknames() { return banknames; }
+        std::vector<hipo::bank>  getBanklist()  { return  banklist; }
+        std::vector<std::vector<int>> getTypelist()         { return typelist; }
+        std::vector<std::vector<std::string>> getItemlist() { return itemlist; }
+        hipo::reader getReader()   { return reader; }
+        // hipo::writer getWriter()   { return writer; }
+        hipo::dictionary getDict() { return dict;   }
+        hipo::event getEvent()     { return event;  }
+
+  }; // class HipoFileIterator
+
+//--------------------------------------------------//
+// HipoFileIterator Trampoline class
+template <class HipoFileIteratorBase = HipoFileIterator> class PyHipoFileIterator : public HipoFileIteratorBase {
+public:
+    using HipoFileIteratorBase::HipoFileIteratorBase; // Inherit constructors
+};
 
 //--------------------------------------------------//
 // HIPO Trampoline classes
@@ -82,6 +382,69 @@ public:
 
 namespace py = pybind11;
 PYBIND11_MODULE(hipopybind, m) {
+
+    //ADDED BEGIN
+    //----------------------------------------------------------------------//
+    // Bind HipoFileIterator
+    py::class_<HipoFileIterator, PyHipoFileIterator<>> hipofileiterator(m, "HipoFileIterator");
+    hipofileiterator.def(py::init([](std::vector<std::string> & filenames, std::vector<std::string> & banknames, int batchsize) { return new HipoFileIterator(filenames,banknames,batchsize); }));
+    hipofileiterator.def("open", &HipoFileIterator::open);
+    hipofileiterator.def("reset", &HipoFileIterator::reset);
+    hipofileiterator.def("next", &HipoFileIterator::next);
+    hipofileiterator.def("gotoEvent", &HipoFileIterator::gotoEvent);
+    hipofileiterator.def("getType", &HipoFileIterator::getType);
+    hipofileiterator.def("getDoubles", &HipoFileIterator::getDoubles);
+    hipofileiterator.def("getFloats", &HipoFileIterator::getFloats);
+    hipofileiterator.def("getInts", &HipoFileIterator::getInts);
+    hipofileiterator.def("getLongs", &HipoFileIterator::getLongs);
+    hipofileiterator.def("getShorts", &HipoFileIterator::getShorts);
+    hipofileiterator.def("getBytes", &HipoFileIterator::getBytes);
+
+    hipofileiterator.def_property_readonly("batchsize",&HipoFileIterator::getBatchsize);
+    hipofileiterator.def_property_readonly("nbanks",&HipoFileIterator::getNBanks);
+    hipofileiterator.def_property_readonly("index",&HipoFileIterator::getIndex);
+    hipofileiterator.def_property_readonly("filenames",&HipoFileIterator::getFilenames);
+    hipofileiterator.def_property_readonly("banknames",&HipoFileIterator::getBanknames);
+    hipofileiterator.def_property_readonly("banks",&HipoFileIterator::getBanklist);
+    hipofileiterator.def_property_readonly("types",&HipoFileIterator::getTypelist);
+    hipofileiterator.def_property_readonly("items",&HipoFileIterator::getItemlist);
+    hipofileiterator.def_property_readonly("reader",&HipoFileIterator::getReader);
+    hipofileiterator.def_property_readonly("dict",&HipoFileIterator::getDict);
+    hipofileiterator.def_property_readonly("event",&HipoFileIterator::getEvent);
+
+    hipofileiterator.def("__repr__", //TODO: Test this function in python
+        [](HipoFileIterator &hfi) { std::string r("HipoFileIterator"); return r; }
+    );
+    hipofileiterator.def("__eq__", //TODO: Test this function in python
+        [](HipoFileIterator *hfi1, HipoFileIterator *hfi2) { return hfi1 == hfi2; }
+    );
+    hipofileiterator.def("__next__", //TODO: Test this function in python
+        [](HipoFileIterator &hfi) { hfi.reset(); hfi.next(); return; }
+    );
+
+    // * DONE *: TODO: ADD METHOD TO GET TYPE OF KEY AND THEN GET ARRAY? -> Can then use __get__ method
+    // * DONE *: TODO: ADD RAISE STOP_ITERATION IN __NEXT__
+    // * DONE *: TODO: ADD GET SET METHOD AND ADD def.property for accessible attributes like reader and banklist and filenames and banknames and entry names and batch size and index and so on....
+    //TODO: HOW TO LINK AWKWARD / NUMPY ARRAYS DIRECTLY TO RETURNED VECTORS
+    //TODO: LONGTERM: HipoFileWriter -> Handles reading and writing simultaneously.
+    //TODO: LONGTERM: Writing to file with [] operator accessor.
+
+
+    // hipofileiterator.def("__get__", //NOTE: THIS WILL NOT WORK SINCE THE LAMBDA NEEDS TO HAVE THE SAME RETURN TYPE EVERY TIME...
+    //     [](HipoFileIterator &hfi,std::string bankname, std::string item) {
+    //         int type = hfi.getType(bankname,item);
+    //         switch (type) {
+    //             case 3: return hfi.getInts(bankname,item);
+    //             case 4: return hfi.getFloats(bankname,item);
+    //             case 5: return hfi.getDoubles(bankname,item);
+    //             case 8: return hfi.getLongs(bankname,item);
+    //             case 1: return hfi.getBytes(bankname,item);
+    //             case 2: return hfi.getShorts(bankname,item);
+    //             default: throw pybind11::type_error("HipoFileIterator: Invalid type int for entry: "+bankname+" "+item+"\n");
+    //         }
+    //     }
+    // );
+    //ADDED END
 
     //----------------------------------------------------------------------//
     // Bind HIPO utils
