@@ -443,7 +443,7 @@ PYBIND11_MODULE(hipopybind, m) {
         [](HipoFileIterator *hfi1, HipoFileIterator *hfi2) { return hfi1 == hfi2; }
     );
     hipofileiterator.def("__next__", //TODO: Test this function in python
-        [](HipoFileIterator &hfi) { hfi.reset(); hfi.next(); return; }
+        [](HipoFileIterator &hfi) { hfi.reset(); return hfi.next(); }
     );
 
     // * DONE *: TODO: ADD METHOD TO GET TYPE OF KEY AND THEN GET ARRAY? -> Can then use __get__ method
