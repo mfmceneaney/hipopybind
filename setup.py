@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
@@ -16,21 +17,24 @@ PLAT_TO_CMAKE = {
     "win-arm64": "ARM64",
 }
 
+
 # A CMakeExtension needs a sourcedir instead of a file list.
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
-    def __init__(self, name, sourcedir=""):
-        Extension.__init__(self, name, sources=[])
-        self.sourcedir = os.path.abspath(sourcedir)
+    def __init__(self, name: str, sourcedir: str = "") -> None:
+        super().__init__(name, sources=[])
+        self.sourcedir = os.fspath(Path(sourcedir).resolve())
+
 
 class CMakeBuild(build_ext):
-    def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+    def build_extension(self, ext: CMakeExtension) -> None:
+        # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
+        ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)
+        extdir = ext_fullpath.parent.resolve()
 
-        # required for auto-detection & inclusion of auxiliary "native" libs
-        if not extdir.endswith(os.path.sep):
-            extdir += os.path.sep
+        # Using this requires trailing slash for auto-detection & inclusion of
+        # auxiliary "native" libs
 
         debug = int(os.environ.get("DEBUG", 0)) if self.debug is None else self.debug
         cfg = "Debug" if debug else "Release"
@@ -43,7 +47,7 @@ class CMakeBuild(build_ext):
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
-            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
         ]
@@ -62,16 +66,19 @@ class CMakeBuild(build_ext):
             # exported for Ninja to pick it up, which is a little tricky to do.
             # Users can override the generator with CMAKE_GENERATOR in CMake
             # 3.15+.
-            if not cmake_generator and not sys.platform.startswith('linux'): #NOTE: #DEBUGGING: ADDED FOR BUILD TO WORK ON IFARM
+            if (not cmake_generator or cmake_generator == "Ninja") and not sys.platform.startswith('linux'): #NOTE: #DEBUGGING: ADDED FOR BUILD TO WORK ON IFARM
                 try:
-                    import ninja  # noqa: F401
+                    import ninja
 
-                    cmake_args += ["-GNinja"]
+                    ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
+                    cmake_args += [
+                        "-GNinja",
+                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
+                    ]
                 except ImportError:
                     pass
 
         else:
-
             # Single config generators are handled "normally"
             single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
 
@@ -106,12 +113,16 @@ class CMakeBuild(build_ext):
                 # CMake 3.12+ only.
                 build_args += [f"-j{self.parallel}"]
 
-        build_temp = os.path.join(self.build_temp, ext.name)
-        if not os.path.exists(build_temp):
-            os.makedirs(build_temp)
+        build_temp = Path(self.build_temp) / ext.name
+        if not build_temp.exists():
+            build_temp.mkdir(parents=True)
 
-        subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=build_temp)
-        subprocess.check_call(["cmake", "--build", "."] + build_args, cwd=build_temp)
+        subprocess.run(
+            ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
+        )
+        subprocess.run(
+            ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
+        )
 
 #NOTE: Define function for reading README file into long description
 def read(fname):
@@ -121,7 +132,7 @@ def read(fname):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="hipopybind",
-    version="1.0.0",
+    version="0.1.1",
     author="Matthew McEneaney",
     author_email="matthew.mceneaney@duke.edu",
     license="MIT",
@@ -133,5 +144,5 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
-    python_requires=">=3.6",
+    python_requires=">=3.7",
 )
