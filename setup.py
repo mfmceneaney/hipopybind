@@ -132,7 +132,7 @@ def read(fname):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="hipopybind",
-    version="1.0.0",
+    version="1.0.1",
     author="Matthew McEneaney",
     author_email="matthew.mceneaney@duke.edu",
     license="MIT",
