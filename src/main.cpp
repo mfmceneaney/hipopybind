@@ -87,7 +87,7 @@ class HipoFileIterator {
             // Check batchsize
             if (batchsize<=0) throw std::invalid_argument("HipoFileIterator: batch_size must be > 0");
 
-            index = 0;
+            index = -1;
 
             // Set tags before opening files
             for (int i=0; i<tags.size(); i++) { reader.setTags(tags.at(i)); }
@@ -138,11 +138,11 @@ class HipoFileIterator {
         * @return bool
         */
         bool open() {  //TODO: Check inline is beneficial here.
+            index++;
             if (index>=filenames.size()) return false;
             const char * filename = filenames.at(index).c_str();
             reader.open(filename);
             reader.readDictionary(dict); //TODO: Figure out how to check file here....
-            index++;
             return true;
         }
 
@@ -233,15 +233,15 @@ class HipoFileIterator {
 
                 } // for (int i = 0; i<nbanks; i++)
                 counter++;
-                if (counter>=batchsize) return true;
+                if (counter>=batchsize) { return true; }
             }
             // Move on to next file if batch is not yet complete
-            if (counter<batchsize) {
-                if (open()) next(counter); //NOTE: Recursive function
-                // else throw pybind11::stop_iteration("");//NOTE: NOT YET TESTED //TODO: NOTE: THIS SHOULD NOT RAISE A STOP ITERATION BECAUSE YOU STILL NEED TO GET THE BATCH DATA IN PYTHON
+            if (open()) {
+                return next(counter); //NOTE: Recursive function //NOTE: If you do not return here, the original function keeps going after the recursive call and returns false and so ends iteration.
             }
+            //TODO: NOTE: THIS SHOULD NOT RAISE A STOP ITERATION BECAUSE YOU STILL NEED TO GET THE BATCH DATA IN PYTHON
             return false; //NOTE: Only happens if you've reached the end of all files.
-        } //TODO
+        }
 
         /**
         * Get type int for given bank name and entry name.
