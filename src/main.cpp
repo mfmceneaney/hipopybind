@@ -233,7 +233,10 @@ class HipoFileIterator {
 
                 } // for (int i = 0; i<nbanks; i++)
                 counter++;
-                if (counter>=batchsize) { return true; }
+                if (counter>=batchsize) {
+                    if (!reader.hasNext() && index>=filenames.size()-1) return false;
+                    return true;
+                }
             }
             // Move on to next file if batch is not yet complete
             if (open()) {
