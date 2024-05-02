@@ -189,6 +189,136 @@ class HipoFileIterator {
             return tags;
         }
 
+        //--------------------------------------------------//
+        // Get array functions - Matthew McEneaney
+
+        //TODO: ADDED
+        inline std::vector<int> getInts_(hipo::bank bank, const char *name) const noexcept{
+        int item = bank.getSchema().getEntryOrder(name);
+        std::vector<int> arr(0);
+        if(bank.getSchema().getEntryType(item)==3) {
+            for (int index=0; index<bank.getRows(); index++) {
+            int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+            arr.push_back((int)bank.getIntAt(offset));
+            }
+        }
+        return arr;
+        }
+
+        //TODO: ADDED
+        inline std::vector<int> getShorts_(hipo::bank bank, const char *name) const noexcept{
+        int item = bank.getSchema().getEntryOrder(name);
+        std::vector<int> arr(0);
+        if(bank.getSchema().getEntryType(item)==2) {
+            for (int index=0; index<bank.getRows(); index++) {
+            int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+            arr.push_back((int)bank.getShortAt(offset));
+            }
+        }
+        return arr;
+        }
+
+        //TODO: ADDED
+        inline std::vector<int> getBytes_(hipo::bank bank, const char *name) const noexcept{
+        int item = bank.getSchema().getEntryOrder(name);
+        std::vector<int> arr(0);
+        if(bank.getSchema().getEntryType(item)==1) {
+            for (int index=0; index<bank.getRows(); index++) {
+            int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+            arr.push_back((int)bank.getByteAt(offset));
+            }
+        }
+        return arr;
+        }
+
+        //TODO: ADDED
+        inline std::vector<float>  getFloats_(hipo::bank bank, const char *name) const noexcept{
+        int item = bank.getSchema().getEntryOrder(name);
+        std::vector<float> arr(0);
+        if(bank.getSchema().getEntryType(item)==4) {
+            for (int index=0; index<bank.getRows(); index++) {
+            int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+            arr.push_back(bank.getFloatAt(offset));
+            }
+        }
+        return arr;
+        }
+
+        //TODO: ADDED
+        inline std::vector<double>  getDoubles_(hipo::bank bank, const char *name) const noexcept{
+        int item = bank.getSchema().getEntryOrder(name);
+        std::vector<double> arr(0);
+        if(bank.getSchema().getEntryType(item)==5) {
+            for (int index=0; index<bank.getRows(); index++) {
+            int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+            arr.push_back(bank.getDoubleAt(offset));
+            }
+        }
+        return arr;
+        }
+
+        //TODO: ADDED
+        inline std::vector<long>  getLongs_(hipo::bank bank, const char *name) const noexcept{
+        int item = bank.getSchema().getEntryOrder(name);
+        std::vector<long> arr(0);
+        if(bank.getSchema().getEntryType(item)==8) {
+            for (int index=0; index<bank.getRows(); index++) {
+            int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+            arr.push_back(bank.getLongAt(offset));
+            }
+        }
+        return arr;
+        }
+
+        //--------------------------------------------------//
+
+        // //--------------------------------------------------// //NOTE: NOT USED SO COMMENTED OUT FOR NOW. 5/2/24
+
+        // inline void putInts_(hipo::bank bank, const char *name, std::vector<int32_t> arr) {
+        // int item = bank.getSchema().getEntryOrder(name);
+        // for (std::size_t index = 0; index < arr.size(); index++) {
+        //     int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+        //     bank.putIntAt(offset,arr[index]);
+        // }
+        // }
+        // inline void putShorts_(hipo::bank bank, const char *name, std::vector<int16_t> arr) {
+        // int item = bank.getSchema().getEntryOrder(name);
+        // for (std::size_t index = 0; index < arr.size(); index++) {
+        //     int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+        //     bank.putShortAt(offset,arr[index]);
+        // }
+        // }
+        // inline void putBytes_(hipo::bank bank, const char *name, std::vector<int8_t> arr) {
+        // int item = bank.getSchema().getEntryOrder(name);
+        // for (std::size_t index = 0; index < arr.size(); index++) {
+        //     int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+        //     bank.putByteAt(offset,arr[index]);
+        // }
+        // }
+        // inline void putFloats_(hipo::bank bank, const char *name, std::vector<float> arr) {
+        // int item = bank.getSchema().getEntryOrder(name);
+        // for (std::size_t index = 0; index < arr.size(); index++) {
+        //     int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+        //     bank.putFloatAt(offset,arr[index]);
+        // }
+        // }
+        // inline void putDoubles_(hipo::bank bank, const char *name, std::vector<double> arr) {
+        // int item = bank.getSchema().getEntryOrder(name);
+        // for (std::size_t index = 0; index < arr.size(); index++) {
+        //     int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+        //     bank.putDoubleAt(offset,arr[index]);
+        // }
+        // }
+        // inline void putLongs_(hipo::bank bank, const char *name, std::vector<int64_t> arr) {
+        // int item = bank.getSchema().getEntryOrder(name);
+        // for (std::size_t index = 0; index < arr.size(); index++) {
+        //     int offset = bank.getSchema().getOffset(item, index, bank.getRows());
+        //     bank.putLongAt(offset,arr[index]);
+        // }
+        // }
+
+        // //--------------------------------------------------//
+
         /**
         * Recursive function which loops file(s) to read data into next batch.
         * @param int __counter__
@@ -221,12 +351,12 @@ class HipoFileIterator {
                         const char * name = entrynames.at(j).c_str();
                         int entryindex = item_index_map.at(bankname+separator+name);
                         switch(type) {
-                            case 1: vec_byte.at(entryindex).push_back(bank.getBytes(name)); break; //NOTE COULD INSERT INTO PREEXISTING VECTOR?  AND THEN INITIALIZE VECTOR WITH CORRECT DIMENSIONS ON FIRST TWO AXES...
-                            case 2: vec_short.at(entryindex).push_back(bank.getShorts(name)); break; //TODO: ALSO NEED TO DEAL WITH CASE WHERE SOME EVENTS DON'T HAVE ALL THE BANKS.
-                            case 3: vec_int.at(entryindex).push_back(bank.getInts(name)); break; //TODO: Make sure this will modify in place.
-                            case 4: vec_float.at(entryindex).push_back(bank.getFloats(name)); break; //TODO: Figure out how to add empty events for banks that don't occur in a given event... -> GetDoubles etc should return empty array if bank is empty in event and schema is still there so this should be fine, in principle.
-                            case 5: vec_double.at(entryindex).push_back(bank.getDoubles(name)); break;
-                            case 8: vec_long.at(entryindex).push_back(bank.getLongs(name)); break;
+                            case 1: vec_byte.at(entryindex).push_back(getBytes_(bank,name)); break; //NOTE COULD INSERT INTO PREEXISTING VECTOR?  AND THEN INITIALIZE VECTOR WITH CORRECT DIMENSIONS ON FIRST TWO AXES...
+                            case 2: vec_short.at(entryindex).push_back(getShorts_(bank,name)); break; //TODO: ALSO NEED TO DEAL WITH CASE WHERE SOME EVENTS DON'T HAVE ALL THE BANKS.
+                            case 3: vec_int.at(entryindex).push_back(getInts_(bank,name)); break; //TODO: Make sure this will modify in place.
+                            case 4: vec_float.at(entryindex).push_back(getFloats_(bank,name)); break; //TODO: Figure out how to add empty events for banks that don't occur in a given event... -> GetDoubles etc should return empty array if bank is empty in event and schema is still there so this should be fine, in principle.
+                            case 5: vec_double.at(entryindex).push_back(getDoubles_(bank,name)); break;
+                            case 8: vec_long.at(entryindex).push_back(getLongs_(bank,name)); break;
                             default: throw pybind11::type_error("HipoFileIterator: Invalid type int for entry: "+entrynames.at(j)+"\n");
                         }
                     } // for (int j = 0; j<nentries; j++)
@@ -718,14 +848,91 @@ PYBIND11_MODULE(hipopybind, m) {
     bank.def("getLong", py::detail::overload_cast_impl<int, int>()(&hipo::bank::getLong, py::const_), "getLong");
     bank.def("getLong", py::detail::overload_cast_impl<const char*, int>()(&hipo::bank::getLong, py::const_), "getLong");
 
-    bank.def("getInts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getInts, py::const_), "getInts");
-    bank.def("getShorts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getShorts, py::const_), "getShorts");
-    bank.def("getBytes", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getBytes, py::const_), "getBytes");
-    bank.def("getFloats", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getFloats, py::const_), "getFloats");
-    bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
-    bank.def("getLongs", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getLongs, py::const_), "getLongs");
+    // bank.def("getInts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getInts, py::const_), "getInts");
+    // bank.def("getShorts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getShorts, py::const_), "getShorts");
+    // bank.def("getBytes", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getBytes, py::const_), "getBytes");
+    // bank.def("getFloats", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getFloats, py::const_), "getFloats");
+    // bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
+    // bank.def("getLongs", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getLongs, py::const_), "getLongs");
 
-    bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
+    bank.def("getInts",
+        [](hipo::bank &b, const char * name) {
+            int item = b.getSchema().getEntryOrder(name);
+            std::vector<int> arr(0);
+            if(b.getSchema().getEntryType(item)==3) {
+                for (int index=0; index<b.getRows(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                arr.push_back((int)b.getIntAt(offset));
+                }
+            }
+            return arr;
+        }
+    );
+    bank.def("getShorts",
+        [](hipo::bank &b, const char * name) {
+            int item = b.getSchema().getEntryOrder(name);
+            std::vector<int> arr(0);
+            if(b.getSchema().getEntryType(item)==2) {
+                for (int index=0; index<b.getRows(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                arr.push_back((int)b.getShortAt(offset));
+                }
+            }
+            return arr;
+        }
+    );
+    bank.def("getBytes",
+        [](hipo::bank &b, const char * name) {
+            int item = b.getSchema().getEntryOrder(name);
+            std::vector<int> arr(0);
+            if(b.getSchema().getEntryType(item)==1) {
+                for (int index=0; index<b.getRows(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                arr.push_back((int)b.getByteAt(offset));
+                }
+            }
+            return arr;
+        }
+    );
+    bank.def("getFloats",
+        [](hipo::bank &b, const char * name) {
+            int item = b.getSchema().getEntryOrder(name);
+            std::vector<float> arr(0);
+            if(b.getSchema().getEntryType(item)==4) {
+                for (int index=0; index<b.getRows(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                arr.push_back(b.getFloatAt(offset));
+                }
+            }
+            return arr;
+        }
+    );
+    bank.def("getDoubles",
+        [](hipo::bank &b, const char * name) {
+            int item = b.getSchema().getEntryOrder(name);
+            std::vector<double> arr(0);
+            if(b.getSchema().getEntryType(item)==5) {
+                for (int index=0; index<b.getRows(); index++) {
+                    int offset = b.getSchema().getOffset(item, index, b.getRows());
+                    arr.push_back(b.getDoubleAt(offset));
+                }
+            }
+            return arr;
+        }
+    );
+    bank.def("getLongs",
+        [](hipo::bank &b, const char * name) {
+            int item = b.getSchema().getEntryOrder(name);
+            std::vector<long> arr(0);
+            if(b.getSchema().getEntryType(item)==8) {
+                for (int index=0; index<b.getRows(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                arr.push_back(b.getLongAt(offset));
+                }
+            }
+            return arr;
+        }
+    );
     
     bank.def("putInt", py::detail::overload_cast_impl<int, int, int32_t>()(&hipo::bank::putInt), "putInt");
     bank.def("putInt", py::detail::overload_cast_impl<const char*, int, int32_t>()(&hipo::bank::putInt), "putInt");
@@ -740,12 +947,69 @@ PYBIND11_MODULE(hipopybind, m) {
     bank.def("putLong", py::detail::overload_cast_impl<int, int, int64_t>()(&hipo::bank::putLong), "putLong");
     bank.def("putLong", py::detail::overload_cast_impl<const char*, int, int64_t>()(&hipo::bank::putLong), "putLong");
 
-    bank.def("putInts", py::detail::overload_cast_impl<const char*, std::vector<int32_t>>()(&hipo::bank::putInts), "putInts");
-    bank.def("putShorts", py::detail::overload_cast_impl<const char*, std::vector<int16_t>>()(&hipo::bank::putShorts), "putShorts");
-    bank.def("putBytes", py::detail::overload_cast_impl<const char*, std::vector<int8_t>>()(&hipo::bank::putBytes), "putBytes");
-    bank.def("putFloats", py::detail::overload_cast_impl<const char*, std::vector<float>>()(&hipo::bank::putFloats), "putFloats");
-    bank.def("putDoubles", py::detail::overload_cast_impl<const char*, std::vector<double>>()(&hipo::bank::putDoubles), "putDoubles");
-    bank.def("putLongs", py::detail::overload_cast_impl<const char*, std::vector<int64_t>>()(&hipo::bank::putLongs), "putLongs");
+    // bank.def("putInts", py::detail::overload_cast_impl<const char*, std::vector<int32_t>>()(&hipo::bank::putInts), "putInts");
+    // bank.def("putShorts", py::detail::overload_cast_impl<const char*, std::vector<int16_t>>()(&hipo::bank::putShorts), "putShorts");
+    // bank.def("putBytes", py::detail::overload_cast_impl<const char*, std::vector<int8_t>>()(&hipo::bank::putBytes), "putBytes");
+    // bank.def("putFloats", py::detail::overload_cast_impl<const char*, std::vector<float>>()(&hipo::bank::putFloats), "putFloats");
+    // bank.def("putDoubles", py::detail::overload_cast_impl<const char*, std::vector<double>>()(&hipo::bank::putDoubles), "putDoubles");
+    // bank.def("putLongs", py::detail::overload_cast_impl<const char*, std::vector<int64_t>>()(&hipo::bank::putLongs), "putLongs");
+
+    bank.def("putInts",
+        [](hipo::bank &b, const char * name, std::vector<int32_t> arr) {
+            int item = b.getSchema().getEntryOrder(name);
+            for (std::size_t index = 0; index < arr.size(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                b.putIntAt(offset,arr[index]);
+            }
+        } // [](hipo::bank &b, const char * name, std::vector<int32_t> arr) {
+    );
+    bank.def("putShorts",
+        [](hipo::bank &b, const char * name, std::vector<int16_t> arr) {
+            int item = b.getSchema().getEntryOrder(name);
+            for (std::size_t index = 0; index < arr.size(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                b.putShortAt(offset,arr[index]);
+            }
+        } // [](hipo::bank &b, const char * name, std::vector<int16_t> arr) {
+    );
+    bank.def("putBytes",
+        [](hipo::bank &b, const char * name, std::vector<int8_t> arr) {
+            int item = b.getSchema().getEntryOrder(name);
+            for (std::size_t index = 0; index < arr.size(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                b.putByteAt(offset,arr[index]);
+            }
+        } // [](hipo::bank &b, const char * name, std::vector<int8_t> arr) {
+    );
+    bank.def("putFloats",
+        [](hipo::bank &b, const char * name, std::vector<float> arr) {
+            int item = b.getSchema().getEntryOrder(name);
+            for (std::size_t index = 0; index < arr.size(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                b.putFloatAt(offset,arr[index]);
+            }
+        } // [](hipo::bank &b, const char * name, std::vector<float> arr) {
+    );
+    bank.def("putDoubles",
+        [](hipo::bank &b, const char * name, std::vector<double> arr) {
+            int item = b.getSchema().getEntryOrder(name);
+            for (std::size_t index = 0; index < arr.size(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                b.putDoubleAt(offset,arr[index]);
+            }
+        } // [](hipo::bank &b, const char * name, std::vector<double> arr) {
+    );
+    bank.def("putLongs",
+        [](hipo::bank &b, const char * name, std::vector<int64_t> arr) {
+            int item = b.getSchema().getEntryOrder(name);
+            for (std::size_t index = 0; index < arr.size(); index++) {
+                int offset = b.getSchema().getOffset(item, index, b.getRows());
+                b.putLongAt(offset,arr[index]);
+            }
+        } // [](hipo::bank &b, const char * name, std::vector<int64_t> arr) {
+    );
+
+    //--------------------------------------------------//
 
     bank.def("show", &hipo::bank::show);
     bank.def("reset", &hipo::bank::reset);
