@@ -722,7 +722,8 @@ PYBIND11_MODULE(hipopybind, m) {
     schema.def("exists", &hipo::schema::exists);
     schema.def("getOffset", py::detail::overload_cast_impl<int, int, int>()(&hipo::schema::getOffset, py::const_), "getOffset"); //NOTE:  Need this syntax for const functions!
     schema.def("getOffset", py::detail::overload_cast_impl<const char*, int, int>()(&hipo::schema::getOffset, py::const_), "getOffset"); //NOTE:  Need this syntax for const functions!
-    schema.def("getEntryType", &hipo::schema::getEntryType);
+    // schema.def("getEntryType", &hipo::schema::getEntryType); //NOTE: FUNCTION IS OVERLOADED IN GAGIK GAVALIAN'S REPO.
+    schema.def("getEntryType", py::detail::overload_cast_impl<int>()(&hipo::schema::getEntryType, py::const_), "getEntryType"); //NOTE: NEED THIS FOR CONST FUNCTIONS
     schema.def("getEntryName", &hipo::schema::getEntryName);
     schema.def("getSchemaString", &hipo::schema::getSchemaString);
     schema.def("getSchemaStringJson", &hipo::schema::getSchemaStringJson);
@@ -1063,7 +1064,7 @@ PYBIND11_MODULE(hipopybind, m) {
     event.def("getStructure", static_cast<void (hipo::event::*)(hipo::bank&)>(&hipo::event::getStructure), "getStructure");
     // event.def_static("getStructure", static_cast<void (hipo::event::*)(const char*, hipo::structure&, int, int)>(&hipo::event::getStructure), "getStructure"); //TODO: //NOTE: Not sure why this doesn't work right now...
     event.def("getTag", &hipo::event::getTag);
-    event.def("read", &hipo::event::read);
+    event.def("read", static_cast<void (hipo::event::*)(hipo::bank&)>(&hipo::event::read), "read"); //NOTE: FUNCTION IS OVERLOADED IN GAGIK GAVALIAN'S REPO.
     event.def("addStructure", &hipo::event::addStructure);
     event.def("getStructurePosition", static_cast<std::pair<int,int> (hipo::event::*)(int, int)>(&hipo::event::getStructurePosition), "getStructurePosition");
     // event.def_static("getStructurePosition", static_cast<std::pair<int,int> (hipo::event::*)(const char*, int, int)>(&hipo::event::getStructurePosition), "getStructurePosition"); //TODO: //NOTE: Not sure why this doesn't work right now...  same as above is a static method maybe that is why...
@@ -1169,7 +1170,7 @@ PYBIND11_MODULE(hipopybind, m) {
 
     reader.def("getNRecords", &hipo::reader::getNRecords);
     reader.def("nextInRecord", &hipo::reader::nextInRecord);
-    reader.def("loadRecord", &hipo::reader::loadRecord);
+    // reader.def("loadRecord", &hipo::reader::loadRecord); //NOTE: REMOVED IN GAGIK GAVALIAN'S UPDATED REPO.
     reader.def("getEntries", &hipo::reader::getEntries);
 
     reader.def("__repr__",
