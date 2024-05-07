@@ -5,7 +5,7 @@ from glob import glob
 
 # Bind hipo
 hipopath = '/group/clas12/packages/hipo/4.0.1/' #NOTE: COULD SET THIS FROM SUBMODULE... OR FROM HIPO ENVIRONMENT VARIABLE
-if 'HIPO' in os.environ.keys():
+if 'HIPO_CPPYY_HOME' in os.environ.keys():
     hipopath = os.environ['HIPO']
 include_path = osp.join(hipopath,'include')
 library_path = osp.join(hipopath,'lib')
