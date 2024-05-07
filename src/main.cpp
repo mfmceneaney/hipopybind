@@ -1163,6 +1163,7 @@ PYBIND11_MODULE(hipopybind, m) {
     reader.def("hasNext", &hipo::reader::hasNext);
     reader.def("next", static_cast<bool (hipo::reader::*)()>(&hipo::reader::next), "next");
     reader.def("next", static_cast<bool (hipo::reader::*)(hipo::event&)>(&hipo::reader::next), "next");
+    reader.def("getBanks", &hipo::reader::getBanks);
     reader.def("gotoEvent", &hipo::reader::gotoEvent);
     reader.def("gotoRecord", &hipo::reader::gotoRecord);
     reader.def("read", &hipo::reader::read);
