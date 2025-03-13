@@ -1,0 +1,5 @@
+[wrap-file]
+directory = pybind11-2.13.6
+source_url = https://github.com/pybind/pybind11/archive/refs/tags/v2.13.6.tar.gz
+source_filename = pybind11-2.13.6.tgz
+source_hash = e08cb87f4773da97fa7b5f035de8763abc656d87d5773e62f6da0587d1f0ec20

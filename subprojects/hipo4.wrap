@@ -1,0 +1,9 @@
+[wrap-file]
+directory = hipo-4.2.0
+source_url = https://github.com/gavalian/hipo/archive/refs/tags/4.2.0.tar.gz
+source_filename = hipo-4.2.0.tar.gz
+source_hash = a5feb44af5ca77d5af0aaae66571241e2eb82abf95c45d563a4541718d1abc6a
+method = meson
+
+[provide]
+hipo4_dep = hipo-4.2.0/hipo4

@@ -1,25 +1,17 @@
+[tool.poetry]
+name = "hipopybind"
+version = "2.0.0"
+description = "Python bindings for CLAS12 HIPO C++ classes with PyBind11"
+authors = ["Matthew McEneaney <matthew.mceneaney@duke.edu>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.build]
+script = "meson.build"
+
 [build-system]
-requires = [
-    "setuptools>61.0",
-    "wheel",
-    "ninja",
-    "cmake>=3.12",
-]
-build-backend = "setuptools.build_meta"
-
-[tool.isort]
-profile = "black"
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-xfail_strict = true
-filterwarnings = ["error"]
-testpaths = ["tests"]
-
-[tool.cibuildwheel]
-test-command = "pytest {project}/tests"
-test-extras = ["test"]
-test-skip = ["*universal2:arm64"]
-# Setuptools bug causes collision between pypy and cpython artifacts
-before-build = "rm -rf {project}/build"
+requires = ["poetry-core","meson-python","pybind11"]
+build-backend = "mesonpy"
