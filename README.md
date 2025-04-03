@@ -4,7 +4,7 @@
 
 * Python >=3.7.3
 * A compiler with C++11 support
-* Pip 10+ or CMake >= 3.4 (or 3.14+ on Windows, which was the first version to support VS 2019)
+* Pip 10+ or CMake >= 3.15 (or 3.14+ on Windows, which was the first version to support VS 2019)
 * Ninja or Pip 10+
 
 ## Installation
