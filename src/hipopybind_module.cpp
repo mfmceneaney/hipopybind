@@ -542,6 +542,20 @@ public:
 namespace py = pybind11;
 PYBIND11_MODULE(_core, m) {
 
+    // Add functions to module
+    m.def("getInts", &_getInts);
+    m.def("getShorts", &_getShorts);
+    m.def("getBytes", &_getBytes);
+    m.def("getFloats", &_getFloats);
+    m.def("getDoubles", &_getDoubles);
+    m.def("getLongs", &_getLongs);
+    m.def("putInts", &_putInts);
+    m.def("putShorts", &_putShorts);
+    m.def("putBytes", &_putBytes);
+    m.def("putFloats", &_putFloats);
+    m.def("putDoubles", &_putDoubles);
+    m.def("putLongs", &_putLongs);
+
     //ADDED BEGIN
     //----------------------------------------------------------------------//
     // Bind HipoFileIterator
