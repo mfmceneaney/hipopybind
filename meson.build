@@ -28,7 +28,7 @@ if not libhipo_dep.found()
 
   libhipo_src_dir = meson.project_source_root() / 'hipo'
   libhipo_build_dir = meson.current_build_dir() / 'libhipo_build'
-  libhipo_install_dir = libhipo_build_dir / 'install'
+  libhipo_install_dir = python.get_install_dir() / 'hipopybind' / 'libhipo'
 
   # Run meson setup
   run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,

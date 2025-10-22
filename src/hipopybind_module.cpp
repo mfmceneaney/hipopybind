@@ -962,9 +962,9 @@ PYBIND11_MODULE(hipopybind, m) {
     event.def("write", &hipo::event::write);
     event.def("read", static_cast<void (hipo::event::*)(hipo::node&, int, int)>(&hipo::event::read), "read");
 
-    event.def_static("getStructurePosition", static_cast<std::pair<int,int> (*)(const char*, int, int)>(&hipo::event::getStructurePosition), "getStructurePosition");
-    event.def_static("getStructure", static_cast<void (*)(const char*, hipo::structure&, int, int)>(&hipo::event::getStructure), "getStructure");
-    event.def_static("get", static_cast<void (*)(const char*, hipo::node&, int, int)>(&hipo::event::get), "get");
+    event.def_static("getStructurePosition_static", static_cast<std::pair<int,int> (*)(const char*, int, int)>(&hipo::event::getStructurePosition), "getStructurePosition");
+    event.def_static("getStructure_static", static_cast<void (*)(const char*, hipo::structure&, int, int)>(&hipo::event::getStructure), "getStructure");
+    event.def_static("get_static", static_cast<void (*)(const char*, hipo::node&, int, int)>(&hipo::event::get), "get");
     event.def_static("getStructureNoCopy", &hipo::event::getStructureNoCopy);
 
     // event.def_property_readonly("databuffer", nullptr); //NOTE: Not really necessary.
