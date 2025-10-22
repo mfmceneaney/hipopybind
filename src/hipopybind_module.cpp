@@ -540,7 +540,7 @@ public:
 // Python Module Bindings
 
 namespace py = pybind11;
-PYBIND11_MODULE(hipopybind, m) {
+PYBIND11_MODULE(_core, m) {
 
     //ADDED BEGIN
     //----------------------------------------------------------------------//

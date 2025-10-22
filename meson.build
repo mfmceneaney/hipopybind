@@ -23,6 +23,9 @@ pybind11_dep = dependency('pybind11', required: true)
 # ---- Try to find libhipo via pkg-config ----
 libhipo_dep = dependency('libhipo', method: 'pkg-config', required: false)
 
+# ---- Set python install directory ----
+hb_pkg_dir = python.get_install_dir() / 'hipopybind'
+
 if not libhipo_dep.found()
   message('libhipo not found via pkg-config. Attempting to build from source...')
 
@@ -41,8 +44,16 @@ if not libhipo_dep.found()
 
   # Assume libhipo_install_dir is a Meson File object or string path
   hipo_include_dir = 'hipo/hipo4'
-  hipo_lib_dir     = libhipo_install_dir / 'lib'
+  hipo_lib_dir     = hb_pkg_dir / 'lib'
   hipo_lib_name    = 'hipo4'
+  install_subdir(
+    hipo_include_dir,
+    install_dir: hb_pkg_dir
+  )
+  install_subdir(
+    libhipo_install_dir / 'lib',
+    install_dir: hb_pkg_dir
+  )
   libhipo_dep = declare_dependency(
     include_directories: include_directories(hipo_include_dir),
     link_args: ['-L' + hipo_lib_dir, '-l' + hipo_lib_name]
@@ -50,10 +61,11 @@ if not libhipo_dep.found()
 endif
 
 # ---- Build the Python extension ----
-pybind_module = python.extension_module('hipopybind',
+install_data('hipopybind/__init__.py', install_dir: hb_pkg_dir)
+pybind_module = python.extension_module('_core',
   'src/hipopybind_module.cpp',
   dependencies: [pybind11_dep, libhipo_dep],
   cpp_args: ['-DVERSION_INFO="@0@"'.format(meson.project_version())],
   install: true,
-  install_dir: python.get_install_dir() / 'hipopybind'
+  install_dir: hb_pkg_dir
 )
