@@ -1,13 +1,16 @@
 #  HipopyBind : HIPO PyBind11 Library
 
+This project exposes in python the [hipo](https://github.com/gavalian/hipo) classes and a few
+custom classes and functions from C++ via [pybind11](https://github.com/pybind/pybind11).
+
 ## Prerequisites
 
 * Python >=3.7.3
-* A compiler with C++11 support
-* Pip 10+ or CMake >= 3.15 (or 3.14+ on Windows, which was the first version to support VS 2019)
+* A compiler with C++17 support
 * Ninja or Pip 10+
+* meson
 
-## Installation
+## :green_circle: Installation
 
 To install from PyPi run:
 
@@ -20,8 +23,7 @@ To compile the library from source run the following:
 ```bash
 git clone --recurse-submodules https://github.com/mfmceneaney/hipopybind.git
 cd hipopybind
-cmake .
-make
+meson setup build
 ```
 
 And add the following to your startup script:
@@ -30,11 +32,12 @@ And add the following to your startup script:
 export PYTHONPATH=$PYTHONPATH\:/path/to/hipopybind
 ```
 
-# Developer Note
-For updating submodules run the following:
+# :rocket: Getting Started
 
+Run the tutorials via:
 ```bash
-git submodule update --init --recursive
+python3 tutorials/write.py
+python3 tutorials/read.py
 ```
 
 #
