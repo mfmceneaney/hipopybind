@@ -3,4 +3,4 @@
 	url = https://github.com/pybind/pybind11.git
 [submodule "hipo"]
 	path = hipo
-	url = https://github.com/mfmceneaney/hipo.git
+	url = https://github.com/gavalian/hipo.git
