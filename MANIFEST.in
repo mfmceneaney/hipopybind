@@ -1,3 +1,0 @@
-include README.md LICENSE pybind11/LICENSE
-graft hipo
-graft src
