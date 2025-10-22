@@ -54,5 +54,5 @@ pybind_module = python.extension_module('hipopybind',
   'src/hipopybind_module.cpp',
   dependencies: [pybind11_dep, libhipo_dep],
   install: true,
-  install_dir: python.get_install_dir()
+  install_dir: python.get_install_dir() / 'hipopybind'
 )
