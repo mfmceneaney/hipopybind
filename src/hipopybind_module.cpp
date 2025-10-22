@@ -32,6 +32,140 @@
 // classes or classes from another cpp project.
 
 //--------------------------------------------------//
+// Get array functions - Matthew McEneaney
+
+std::vector<int> _getInts(hipo::bank bank, const char *name) noexcept {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    std::vector<int> arr(0);
+    if(bankSchema.getEntryType(item)==3) {
+    for (int index=0; index<bank.getRows(); index++) {
+        int offset = bankSchema.getOffset(item, index, bank.getRows());
+        arr.push_back((int)bank.getIntAt(offset));
+    }
+    }
+    return arr;
+}
+
+std::vector<int> _getShorts(hipo::bank bank, const char *name) noexcept {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    std::vector<int> arr(0);
+    if(bankSchema.getEntryType(item)==2) {
+    for (int index=0; index<bank.getRows(); index++) {
+        int offset = bankSchema.getOffset(item, index, bank.getRows());
+        arr.push_back((int)bank.getShortAt(offset));
+    }
+    }
+    return arr;
+}
+
+std::vector<int> _getBytes(hipo::bank bank, const char *name) noexcept {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    std::vector<int> arr(0);
+    if(bankSchema.getEntryType(item)==1) {
+    for (int index=0; index<bank.getRows(); index++) {
+        int offset = bankSchema.getOffset(item, index, bank.getRows());
+        arr.push_back((int)bank.getByteAt(offset));
+    }
+    }
+    return arr;
+}
+
+std::vector<float> _getFloats(hipo::bank bank, const char *name) noexcept {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    std::vector<float> arr(0);
+    if(bankSchema.getEntryType(item)==4) {
+    for (int index=0; index<bank.getRows(); index++) {
+        int offset = bankSchema.getOffset(item, index, bank.getRows());
+        arr.push_back(bank.getFloatAt(offset));
+    }
+    }
+    return arr;
+}
+
+std::vector<double> _getDoubles(hipo::bank bank, const char *name) noexcept {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    std::vector<double> arr(0);
+    if(bankSchema.getEntryType(item)==5) {
+    for (int index=0; index<bank.getRows(); index++) {
+        int offset = bankSchema.getOffset(item, index, bank.getRows());
+        arr.push_back(bank.getDoubleAt(offset));
+    }
+    }
+    return arr;
+}
+
+std::vector<long> _getLongs(hipo::bank bank, const char *name) noexcept {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    std::vector<long> arr(0);
+    if(bankSchema.getEntryType(item)==8) {
+    for (int index=0; index<bank.getRows(); index++) {
+        int offset = bankSchema.getOffset(item, index, bank.getRows());
+        arr.push_back(bank.getLongAt(offset));
+    }
+    }
+    return arr;
+}
+
+//--------------------------------------------------//
+
+void _putInts(hipo::bank &bank, const char *name, std::vector<int32_t> arr) {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    for (std::size_t index = 0; index < arr.size(); index++) {
+    int offset = bankSchema.getOffset(item, index, bank.getRows());
+    bank.putIntAt(offset,arr[index]);
+    }
+}
+void _putShorts(hipo::bank &bank, const char *name, std::vector<int16_t> arr) {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    for (std::size_t index = 0; index < arr.size(); index++) {
+    int offset = bankSchema.getOffset(item, index, bank.getRows());
+    bank.putShortAt(offset,arr[index]);
+    }
+}
+void _putBytes(hipo::bank &bank, const char *name, std::vector<int8_t> arr) {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    for (std::size_t index = 0; index < arr.size(); index++) {
+    int offset = bankSchema.getOffset(item, index, bank.getRows());
+    bank.putByteAt(offset,arr[index]);
+    }
+}
+void _putFloats(hipo::bank &bank, const char *name, std::vector<float> arr) {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    for (std::size_t index = 0; index < arr.size(); index++) {
+    int offset = bankSchema.getOffset(item, index, bank.getRows());
+    bank.putFloatAt(offset,arr[index]);
+    }
+}
+void _putDoubles(hipo::bank &bank, const char *name, std::vector<double> arr) {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    for (std::size_t index = 0; index < arr.size(); index++) {
+    int offset = bankSchema.getOffset(item, index, bank.getRows());
+    bank.putDoubleAt(offset,arr[index]);
+    }
+}
+void _putLongs(hipo::bank &bank, const char *name, std::vector<int64_t> arr) {
+    hipo::schema &bankSchema = bank.getSchema();
+    int item = bankSchema.getEntryOrder(name);
+    for (std::size_t index = 0; index < arr.size(); index++) {
+    int offset = bankSchema.getOffset(item, index, bank.getRows());
+    bank.putLongAt(offset,arr[index]);
+    }
+}
+
+//--------------------------------------------------//
+
+//--------------------------------------------------//
 // Custom classes
 
 class HipoFileIterator {
@@ -137,7 +271,7 @@ class HipoFileIterator {
         * Open the next file in this.filenames if the end of this.filenames has not yet been reached.
         * @return bool
         */
-        bool open() {  //TODO: Check inline is beneficial here.
+        bool open() {
             index++;
             if (index>=filenames.size()) return false;
             const char * filename = filenames.at(index).c_str();
@@ -221,13 +355,13 @@ class HipoFileIterator {
                         const char * name = entrynames.at(j).c_str();
                         int entryindex = item_index_map.at(bankname+separator+name);
                         switch(type) {
-                            case 1: vec_byte.at(entryindex).push_back(bank.getBytes(name)); break; //NOTE COULD INSERT INTO PREEXISTING VECTOR?  AND THEN INITIALIZE VECTOR WITH CORRECT DIMENSIONS ON FIRST TWO AXES...
-                            case 2: vec_short.at(entryindex).push_back(bank.getShorts(name)); break; //TODO: ALSO NEED TO DEAL WITH CASE WHERE SOME EVENTS DON'T HAVE ALL THE BANKS.
-                            case 3: vec_int.at(entryindex).push_back(bank.getInts(name)); break; //TODO: Make sure this will modify in place.
-                            case 4: vec_float.at(entryindex).push_back(bank.getFloats(name)); break; //TODO: Figure out how to add empty events for banks that don't occur in a given event... -> GetDoubles etc should return empty array if bank is empty in event and schema is still there so this should be fine, in principle.
-                            case 5: vec_double.at(entryindex).push_back(bank.getDoubles(name)); break;
-                            case 8: vec_long.at(entryindex).push_back(bank.getLongs(name)); break;
-                            default: throw pybind11::type_error("HipoFileIterator: Invalid type int for entry: "+entrynames.at(j)+"\n");
+                            case 1: vec_byte.at(entryindex).push_back(_getBytes(bank,name)); break; //NOTE COULD INSERT INTO PREEXISTING VECTOR?  AND THEN INITIALIZE VECTOR WITH CORRECT DIMENSIONS ON FIRST TWO AXES...
+                            case 2: vec_short.at(entryindex).push_back(_getShorts(bank,name)); break; //TODO: ALSO NEED TO DEAL WITH CASE WHERE SOME EVENTS DON'T HAVE ALL THE BANKS.
+                            case 3: vec_int.at(entryindex).push_back(_getInts(bank,name)); break; //TODO: Make sure this will modify in place.
+                            case 4: vec_float.at(entryindex).push_back(_getFloats(bank,name)); break; //TODO: Figure out how to add empty events for banks that don't occur in a given event... -> GetDoubles etc should return empty array if bank is empty in event and schema is still there so this should be fine, in principle.
+                            case 5: vec_double.at(entryindex).push_back(_getDoubles(bank,name)); break;
+                            case 8: vec_long.at(entryindex).push_back(_getLongs(bank,name)); break;
+                            default: throw pybind11::type_error("HipoFileIterator: Invalid type " + std::to_string(type) + " for entry: "+entrynames.at(j)+"\n");
                         }
                     } // for (int j = 0; j<nentries; j++)
 
@@ -262,7 +396,7 @@ class HipoFileIterator {
         * @param std::string item
         * @return std::vector<std::vector<double>>
         */
-        std::vector<std::vector<double>> getDoubles(std::string bankname, std::string item) const noexcept { //TODO: Check speed with these methods as inline.
+        std::vector<std::vector<double>> getDoubles(std::string bankname, std::string item) const noexcept {
             int i = item_index_map.at(bankname+separator+item);
             return vec_double.at(i);
         }
@@ -592,7 +726,8 @@ PYBIND11_MODULE(hipopybind, m) {
     schema.def("exists", &hipo::schema::exists);
     schema.def("getOffset", py::detail::overload_cast_impl<int, int, int>()(&hipo::schema::getOffset, py::const_), "getOffset"); //NOTE:  Need this syntax for const functions!
     schema.def("getOffset", py::detail::overload_cast_impl<const char*, int, int>()(&hipo::schema::getOffset, py::const_), "getOffset"); //NOTE:  Need this syntax for const functions!
-    schema.def("getEntryType", &hipo::schema::getEntryType);
+    schema.def("getEntryType", py::detail::overload_cast_impl<int>()(&hipo::schema::getEntryType, py::const_), "getEntryType"); //NOTE:  Need this syntax for const functions!
+    schema.def("getEntryType", py::detail::overload_cast_impl<const char*>()(&hipo::schema::getEntryType, py::const_), "getEntryType"); //NOTE:  Need this syntax for const functions!
     schema.def("getEntryName", &hipo::schema::getEntryName);
     schema.def("getSchemaString", &hipo::schema::getSchemaString);
     schema.def("getSchemaStringJson", &hipo::schema::getSchemaStringJson);
@@ -718,14 +853,14 @@ PYBIND11_MODULE(hipopybind, m) {
     bank.def("getLong", py::detail::overload_cast_impl<int, int>()(&hipo::bank::getLong, py::const_), "getLong");
     bank.def("getLong", py::detail::overload_cast_impl<const char*, int>()(&hipo::bank::getLong, py::const_), "getLong");
 
-    bank.def("getInts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getInts, py::const_), "getInts");
-    bank.def("getShorts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getShorts, py::const_), "getShorts");
-    bank.def("getBytes", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getBytes, py::const_), "getBytes");
-    bank.def("getFloats", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getFloats, py::const_), "getFloats");
-    bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
-    bank.def("getLongs", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getLongs, py::const_), "getLongs");
+    // bank.def("getInts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getInts, py::const_), "getInts");
+    // bank.def("getShorts", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getShorts, py::const_), "getShorts");
+    // bank.def("getBytes", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getBytes, py::const_), "getBytes");
+    // bank.def("getFloats", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getFloats, py::const_), "getFloats");
+    // bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
+    // bank.def("getLongs", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getLongs, py::const_), "getLongs");
 
-    bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
+    // bank.def("getDoubles", py::detail::overload_cast_impl<const char*>()(&hipo::bank::getDoubles, py::const_), "getDoubles");
     
     bank.def("putInt", py::detail::overload_cast_impl<int, int, int32_t>()(&hipo::bank::putInt), "putInt");
     bank.def("putInt", py::detail::overload_cast_impl<const char*, int, int32_t>()(&hipo::bank::putInt), "putInt");
@@ -740,14 +875,21 @@ PYBIND11_MODULE(hipopybind, m) {
     bank.def("putLong", py::detail::overload_cast_impl<int, int, int64_t>()(&hipo::bank::putLong), "putLong");
     bank.def("putLong", py::detail::overload_cast_impl<const char*, int, int64_t>()(&hipo::bank::putLong), "putLong");
 
-    bank.def("putInts", py::detail::overload_cast_impl<const char*, std::vector<int32_t>>()(&hipo::bank::putInts), "putInts");
-    bank.def("putShorts", py::detail::overload_cast_impl<const char*, std::vector<int16_t>>()(&hipo::bank::putShorts), "putShorts");
-    bank.def("putBytes", py::detail::overload_cast_impl<const char*, std::vector<int8_t>>()(&hipo::bank::putBytes), "putBytes");
-    bank.def("putFloats", py::detail::overload_cast_impl<const char*, std::vector<float>>()(&hipo::bank::putFloats), "putFloats");
-    bank.def("putDoubles", py::detail::overload_cast_impl<const char*, std::vector<double>>()(&hipo::bank::putDoubles), "putDoubles");
-    bank.def("putLongs", py::detail::overload_cast_impl<const char*, std::vector<int64_t>>()(&hipo::bank::putLongs), "putLongs");
+    // bank.def("putInts", py::detail::overload_cast_impl<const char*, std::vector<int32_t>>()(&hipo::bank::putInts), "putInts");
+    // bank.def("putShorts", py::detail::overload_cast_impl<const char*, std::vector<int16_t>>()(&hipo::bank::putShorts), "putShorts");
+    // bank.def("putBytes", py::detail::overload_cast_impl<const char*, std::vector<int8_t>>()(&hipo::bank::putBytes), "putBytes");
+    // bank.def("putFloats", py::detail::overload_cast_impl<const char*, std::vector<float>>()(&hipo::bank::putFloats), "putFloats");
+    // bank.def("putDoubles", py::detail::overload_cast_impl<const char*, std::vector<double>>()(&hipo::bank::putDoubles), "putDoubles");
+    // bank.def("putLongs", py::detail::overload_cast_impl<const char*, std::vector<int64_t>>()(&hipo::bank::putLongs), "putLongs");
 
-    bank.def("show", &hipo::bank::show);
+    bank.def("getRowList", &hipo::bank::getRowList);
+    bank.def("getFullRowList", &hipo::bank::getFullRowList);
+    bank.def("getMutableRowList", &hipo::bank::getMutableRowList);
+    bank.def("getRowListLinked", &hipo::bank::getRowListLinked);
+
+    bank.def("show", py::detail::overload_cast_impl<>()(&hipo::bank::show, py::const_), "show"); //NOTE:  Need this syntax for const functions!
+    bank.def("show", py::detail::overload_cast_impl<bool>()(&hipo::bank::show, py::const_), "show"); //NOTE:  Need this syntax for const functions!
+    bank.def("printValue", &hipo::bank::printValue);
     bank.def("reset", &hipo::bank::reset);
     bank.def("notify", &hipo::bank::notify);
 
@@ -796,17 +938,34 @@ PYBIND11_MODULE(hipopybind, m) {
     event.def("init", static_cast<void (hipo::event::*)(std::vector<char>&)>(&hipo::event::init), "init");
     event.def("init", static_cast<void (hipo::event::*)(const char*, int)>(&hipo::event::init), "init");
     event.def("getStructure", static_cast<void (hipo::event::*)(hipo::structure&, int, int)>(&hipo::event::getStructure), "getStructure");
-    event.def("getStructure", static_cast<void (hipo::event::*)(hipo::bank&)>(&hipo::event::getStructure), "getStructure");
-    // event.def_static("getStructure", static_cast<void (hipo::event::*)(const char*, hipo::structure&, int, int)>(&hipo::event::getStructure), "getStructure"); //TODO: //NOTE: Not sure why this doesn't work right now...
+    event.def("getStructure4", &hipo::event::getStructure4);
+
     event.def("getTag", &hipo::event::getTag);
-    event.def("read", &hipo::event::read);
+    event.def("setTag", &hipo::event::setTag);
+    event.def("getStructure", static_cast<void (hipo::event::*)(hipo::bank&)>(&hipo::event::getStructure), "getStructure");
+    event.def("read", static_cast<void (hipo::event::*)(hipo::bank&)>(&hipo::event::read), "read");
     event.def("addStructure", &hipo::event::addStructure);
+    event.def("override", &hipo::event::override);
+    event.def("remove", static_cast<void (hipo::event::*)(hipo::bank&)>(&hipo::event::remove), "remove");
+    event.def("remove", static_cast<void (hipo::event::*)(int, int)>(&hipo::event::remove), "remove");
+    event.def("replace", &hipo::event::replace);
+
+    event.def("add", &hipo::event::add);
+    event.def("get", static_cast<void (hipo::event::*)(hipo::node&, int, int)>(&hipo::event::get), "get");
+
     event.def("getStructurePosition", static_cast<std::pair<int,int> (hipo::event::*)(int, int)>(&hipo::event::getStructurePosition), "getStructurePosition");
-    // event.def_static("getStructurePosition", static_cast<std::pair<int,int> (hipo::event::*)(const char*, int, int)>(&hipo::event::getStructurePosition), "getStructurePosition"); //TODO: //NOTE: Not sure why this doesn't work right now...  same as above is a static method maybe that is why...
+    event.def("getStructurePosition4", static_cast<std::pair<int,int> (hipo::event::*)(int, int)>(&hipo::event::getStructurePosition4), "getStructurePosition4");
+
     event.def("getEventBuffer", &hipo::event::getEventBuffer);
     event.def("getSize", &hipo::event::getSize);
     event.def("reset", &hipo::event::reset);
-    event.def("getStructureNoCopy", &hipo::event::getStructureNoCopy);
+    event.def("write", &hipo::event::write);
+    event.def("read", static_cast<void (hipo::event::*)(hipo::node&, int, int)>(&hipo::event::read), "read");
+
+    event.def_static("getStructurePosition", static_cast<std::pair<int,int> (*)(const char*, int, int)>(&hipo::event::getStructurePosition), "getStructurePosition");
+    event.def_static("getStructure", static_cast<void (*)(const char*, hipo::structure&, int, int)>(&hipo::event::getStructure), "getStructure");
+    event.def_static("get", static_cast<void (*)(const char*, hipo::node&, int, int)>(&hipo::event::get), "get");
+    event.def_static("getStructureNoCopy", &hipo::event::getStructureNoCopy);
 
     // event.def_property_readonly("databuffer", nullptr); //NOTE: Not really necessary.
 
@@ -887,26 +1046,38 @@ PYBIND11_MODULE(hipopybind, m) {
     reader.def(py::init([](const hipo::reader &r) { return new hipo::reader(r); }));
 
     reader.def("about", &hipo::reader::about);
+    reader.def("rewind", &hipo::reader::rewind);
     reader.def("readDictionary", &hipo::reader::readDictionary);
     reader.def("getStructure", &hipo::reader::getStructure);
     reader.def("getStructureNoCopy", &hipo::reader::getStructureNoCopy);
+
+    reader.def("readUserConfig", &hipo::reader::readUserConfig);
+
     reader.def("open", &hipo::reader::open);
+    reader.def("is_open", &hipo::reader::is_open);
     reader.def("setTags", static_cast<void (hipo::reader::*)(int)>(&hipo::reader::setTags), "setTags");
     reader.def("setTags", static_cast<void (hipo::reader::*)(std::vector<long>)>(&hipo::reader::setTags), "setTags");
     reader.def("setVerbose", &hipo::reader::setVerbose);
 
     reader.def("hasNext", &hipo::reader::hasNext);
     reader.def("next", static_cast<bool (hipo::reader::*)()>(&hipo::reader::next), "next");
-    reader.def("next", static_cast<bool (hipo::reader::*)(hipo::event&)>(&hipo::reader::next), "next");
     reader.def("gotoEvent", &hipo::reader::gotoEvent);
     reader.def("gotoRecord", &hipo::reader::gotoRecord);
+    reader.def("next", static_cast<bool (hipo::reader::*)(hipo::event&)>(&hipo::reader::next), "next");
+
+    reader.def("next", static_cast<bool (hipo::reader::*)(std::vector<hipo::bank>&)>(&hipo::reader::next), "next");
+    reader.def("getBanks", &hipo::reader::getBanks);
+
     reader.def("read", &hipo::reader::read);
     reader.def("printWarning", &hipo::reader::printWarning);
 
     reader.def("getNRecords", &hipo::reader::getNRecords);
     reader.def("nextInRecord", &hipo::reader::nextInRecord);
-    reader.def("loadRecord", &hipo::reader::loadRecord);
+    reader.def("loadRecord", static_cast<bool (hipo::reader::*)(int)>(&hipo::reader::loadRecord), "loadRecord");
+    reader.def("loadRecord", static_cast<bool (hipo::reader::*)(hipo::record&, int)>(&hipo::reader::loadRecord), "loadRecord");
     reader.def("getEntries", &hipo::reader::getEntries);
+    reader.def("getInt", &hipo::reader::getInt);
+    reader.def("getFloat", &hipo::reader::getFloat);
 
     reader.def("__repr__",
         [](hipo::reader &r){

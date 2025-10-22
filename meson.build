@@ -42,7 +42,7 @@ if not libhipo_dep.found()
   # Assume libhipo_install_dir is a Meson File object or string path
   hipo_include_dir = 'hipo/hipo4'
   hipo_lib_dir     = libhipo_install_dir / 'lib'
-  hipo_lib_name    = 'hipo'
+  hipo_lib_name    = 'hipo4'
   libhipo_dep = declare_dependency(
     include_directories: include_directories(hipo_include_dir),
     link_args: ['-L' + hipo_lib_dir, '-l' + hipo_lib_name]
