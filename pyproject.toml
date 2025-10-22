@@ -1,25 +1,18 @@
 [build-system]
-requires = [
-    "setuptools>61.0",
-    "wheel",
-    "ninja",
-    "cmake>=3.15",
+requires = ["meson-python", "pybind11","ninja"]
+build-backend = "mesonpy"
+
+[project]
+name = "hipopybind"
+version = "2.0.0"
+description = "Python bindings for hipo using pybind11"
+authors = [
+  { name = "Matthew F. McEneaney", email = "matthew.mceneaney@duke.edu" }
 ]
-build-backend = "setuptools.build_meta"
+readme = "README.md"
+license = { text = "MIT" }
+classifiers = ["Programming Language :: Python :: 3"]
+requires-python = ">=3.7"
 
-[tool.isort]
-profile = "black"
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-xfail_strict = true
-filterwarnings = ["error"]
-testpaths = ["tests"]
-
-[tool.cibuildwheel]
-test-command = "pytest {project}/tests"
-test-extras = ["test"]
-test-skip = ["*universal2:arm64"]
-# Setuptools bug causes collision between pypy and cpython artifacts
-before-build = "rm -rf {project}/build"
+[project.optional-dependencies]
+dev = ["pytest"]
