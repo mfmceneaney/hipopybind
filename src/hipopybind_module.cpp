@@ -1025,7 +1025,7 @@ PYBIND11_MODULE(_core, m) {
                           // %14ld
               }
             } // else
-          } // for(int k = 0; k < b.getRows(); k++)
+          }
           r += "\n";
         } // for(int i = 0; i < b.getSchema().getEntries(); i++)
         return r;
