@@ -226,7 +226,8 @@ public:
     index = -1;
 
     // Set tags before opening files
-    for (int i = 0; i < tags.size(); i++) {
+    int tags_size = tags.size();
+    for (int i = 0; i < tags_size; i++) {
       reader.setTags(tags.at(i));
     }
 
@@ -284,7 +285,8 @@ public:
    */
   bool open() {
     index++;
-    if (index >= filenames.size())
+    int filenames_size = filenames.size();
+    if (index >= filenames_size)
       return false;
     const char *filename = filenames.at(index).c_str();
     reader.open(filename);
@@ -402,7 +404,8 @@ public:
       } // for (int i = 0; i<nbanks; i++)
       counter++;
       if (counter >= batchsize) {
-        if (!reader.hasNext() && index >= filenames.size() - 1)
+        int filenames_size = filenames.size();
+        if (!reader.hasNext() && index >= filenames_size - 1)
           return false;
         return true;
       }
@@ -798,7 +801,8 @@ PYBIND11_MODULE(_core, m) {
                  [](hipo::dictionary &d) {
                    std::vector<std::string> schemaList = d.getSchemaList();
                    std::string r("Dictionary :\n");
-                   for (int idx = 0; idx < schemaList.size(); idx++) {
+                   int schemalist_size = schemaList.size();
+                   for (int idx = 0; idx < schemalist_size; idx++) {
                      const char *buffer = schemaList[idx].c_str();
                      hipo::schema s = d.getSchema(buffer);
                      r += "\tSchema : name = " + s.getName() +
