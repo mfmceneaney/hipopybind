@@ -70,15 +70,56 @@ files = [
 ]
 
 [[package]]
-name = "packaging"
-version = "24.0"
-description = "Core utilities for Python packages"
+name = "meson"
+version = "1.9.1"
+description = "A high performance build system"
 optional = false
 python-versions = ">=3.7"
 groups = ["dev"]
 files = [
-    {file = "packaging-24.0-py3-none-any.whl", hash = "sha256:2ddfb553fdf02fb784c234c7ba6ccc288296ceabec964ad2eae3777778130bc5"},
-    {file = "packaging-24.0.tar.gz", hash = "sha256:eb82c5e3e56209074766e6885bb04b8c38a0c015d0a30036ebe7ece34c9989e9"},
+    {file = "meson-1.9.1-py3-none-any.whl", hash = "sha256:f824ab770c041a202f532f69e114c971918ed2daff7ea56583d80642564598d0"},
+]
+
+[package.extras]
+ninja = ["ninja (>=1.8.2)"]
+progress = ["tqdm"]
+typing = ["mypy", "typing_extensions ; python_version < \"3.8\""]
+
+[[package]]
+name = "meson-python"
+version = "0.18.0"
+description = "Meson Python build backend (PEP 517)"
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "meson_python-0.18.0-py3-none-any.whl", hash = "sha256:3b0fe051551cc238f5febb873247c0949cd60ded556efa130aa57021804868e2"},
+    {file = "meson_python-0.18.0.tar.gz", hash = "sha256:c56a99ec9df669a40662fe46960321af6e4b14106c14db228709c1628e23848d"},
+]
+
+[package.dependencies]
+meson = [
+    {version = ">=0.64.0", markers = "python_version < \"3.12\""},
+    {version = ">=1.2.3", markers = "python_version >= \"3.12\""},
+]
+packaging = ">=23.2"
+pyproject-metadata = ">=0.9.0"
+tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
+
+[package.extras]
+docs = ["furo (>=2024.08.06)", "sphinx (>=8.1.0,<8.2.0)", "sphinx-copybutton (>=0.5.0)", "sphinx-design (>=0.1.0)", "sphinxext-opengraph (>=0.7.0)"]
+test = ["build", "cython (>=3.0.3)", "pytest (>=6.0)", "pytest-cov[toml]", "pytest-mock", "typing-extensions (>=3.7.4) ; python_version < \"3.11\"", "wheel"]
+
+[[package]]
+name = "packaging"
+version = "25.0"
+description = "Core utilities for Python packages"
+optional = false
+python-versions = ">=3.8"
+groups = ["dev"]
+files = [
+    {file = "packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484"},
+    {file = "packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f"},
 ]
 
 [[package]]
@@ -96,6 +137,25 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
+
+[[package]]
+name = "pyproject-metadata"
+version = "0.9.1"
+description = "PEP 621 metadata parsing"
+optional = false
+python-versions = ">=3.7"
+groups = ["dev"]
+files = [
+    {file = "pyproject_metadata-0.9.1-py3-none-any.whl", hash = "sha256:ee5efde548c3ed9b75a354fc319d5afd25e9585fa918a34f62f904cc731973ad"},
+    {file = "pyproject_metadata-0.9.1.tar.gz", hash = "sha256:b8b2253dd1b7062b78cf949a115f02ba7fa4114aabe63fa10528e9e1a954a816"},
+]
+
+[package.dependencies]
+packaging = ">=19.0"
+
+[package.extras]
+docs = ["furo (>=2023.9.10)", "myst-parser", "sphinx (>=7.0)", "sphinx-autodoc-typehints", "sphinx-autodoc-typehints (>=1.10.0)"]
+test = ["exceptiongroup ; python_version < \"3.11\"", "pytest (>=6.2.4)", "pytest-cov[toml] (>=2)", "tomli (>=1.0.0) ; python_version < \"3.11\""]
 
 [[package]]
 name = "pytest"
@@ -149,4 +209,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.8"
-content-hash = "0240ed4fa88a3163f3391b975c7899838bcaa81354b220d523214f53b6dd49b9"
+content-hash = "a296d2b565883e181b58312dd3b74103181ed1af19ffcfba284f78cb0ac7651e"

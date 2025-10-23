@@ -1,11 +1,11 @@
 [build-system]
 requires = [
-    "meson",
+    "meson>=1.0.0",
     "meson-python",
     "pybind11",
     "ninja"
 ]
-build-backend = "mesonpy"
+build-backend = 'mesonpy'
 
 [project]
 name = "hipopybind"
@@ -25,3 +25,4 @@ name = "hipopybind"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 clang-format = "^17.0.0"      # For local C++ formatting
+meson-python = "^0.18.0"
