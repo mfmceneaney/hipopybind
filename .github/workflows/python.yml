@@ -32,7 +32,7 @@ jobs:
           pip install poetry
 
       - name: Configure Poetry
-        run: poetry config virtualenvs.create true
+        run: poetry config virtualenvs.create true && poetry lock
 
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
@@ -46,7 +46,8 @@ jobs:
         run: poetry build
 
       - name: Install package wheel
-        run: pip install dist/*.whl
+        run: |
+          pip install dist/*.whl
 
       - name: Run tests
         run: |
