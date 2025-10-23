@@ -1,4 +1,6 @@
 #  HipopyBind : HIPO PyBind11 Library
+[![PyPI](https://img.shields.io/pypi/v/hipopybind.svg)](https://pypi.org/project/hipopybind/)
+[![Python](https://github.com/mfmceneaney/hipopybind/actions/workflows/python.yml/badge.svg)](https://github.com/mfmceneaney/hipopybind/actions/workflows/python.yml)
 
 This project exposes in python the [hipo](https://github.com/gavalian/hipo) classes and a few
 custom classes and functions from C++ via [pybind11](https://github.com/pybind/pybind11).
