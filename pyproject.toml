@@ -7,20 +7,18 @@ requires = [
 ]
 build-backend = 'mesonpy'
 
-[project]
+[tool.poetry]
 name = "hipopybind"
 version = "2.0.0"
 description = "Python bindings for hipo using pybind11"
-authors = [
-  { name = "Matthew F. McEneaney", email = "matthew.mceneaney@duke.edu" }
-]
+authors = ["Matthew McEneaney <matthew.mceneaney@duke.edu>"]
+repository = "https://github.com/mfmceneaney/hipopybind.git"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 classifiers = ["Programming Language :: Python :: 3"]
-requires-python = ">=3.8"
 
-[tool.poetry]
-name = "hipopybind"
+[tool.poetry.dependencies]
+python = "^3.8.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
