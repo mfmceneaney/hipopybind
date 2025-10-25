@@ -7,7 +7,7 @@ requires = [
 ]
 build-backend = 'mesonpy'
 
-[tool.poetry]
+[project]
 name = "hipopybind"
 version = "2.0.0"
 description = "Python bindings for hipo using pybind11"
@@ -17,7 +17,7 @@ readme = "README.md"
 license = "MIT"
 classifiers = ["Programming Language :: Python :: 3"]
 
-[tool.poetry.dependencies]
+[project.dependencies]
 python = ">=3.9"
 meson = ">=1.2"
 ninja = ">=1.8.2"
