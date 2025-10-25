@@ -125,14 +125,13 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Download distributions
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           path: dist
-
       - name: Upload to TestPyPI
         run: |
           pip install --upgrade pip poetry
+          ls -lrth dist
           poetry publish -r testpypi -u __token__ -p ${{ secrets.TESTPYPI_API_TOKEN }}
 
   publish:
@@ -155,6 +154,9 @@ jobs:
         with:
           path: dist
 
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
       - name: Upload to PyPI
         run: |
           pip install --upgrade pip poetry
