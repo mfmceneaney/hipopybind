@@ -3,7 +3,7 @@ requires = [
     "meson>=1.0.0",
     "meson-python",
     "pybind11",
-    "ninja"
+    "ninja>=1.8.2"
 ]
 build-backend = 'mesonpy'
 
@@ -19,6 +19,9 @@ classifiers = ["Programming Language :: Python :: 3"]
 
 [tool.poetry.dependencies]
 python = ">=3.8.0"
+meson = ">=1.0.0"
+ninja = ">=1.8.2"
+pybind11 = ">=3.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

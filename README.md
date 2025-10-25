@@ -25,7 +25,9 @@ To compile the library from source run the following:
 ```bash
 git clone --recurse-submodules https://github.com/mfmceneaney/hipopybind.git
 cd hipopybind
-meson setup build
+pip install poetry
+poetry run ./install_hipo.sh
+pip install .
 ```
 
 And add the following to your startup script:
