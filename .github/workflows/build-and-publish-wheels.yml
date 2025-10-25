@@ -132,6 +132,11 @@ jobs:
         run: |
           pip install --upgrade pip poetry
           ls -lrth dist
+          mkdir -p dist_flat
+          cp dist/**/*.whl dist_flat/
+          rm -rf dist
+          mv dist_flat dist
+          ls -lrth dist
           poetry publish -r testpypi -u __token__ -p ${{ secrets.TESTPYPI_API_TOKEN }}
 
   publish:
@@ -160,4 +165,9 @@ jobs:
       - name: Upload to PyPI
         run: |
           pip install --upgrade pip poetry
+          mkdir -p dist_flat
+          cp dist/**/*.whl dist_flat/
+          rm -rf dist
+          mv dist_flat dist
+          ls -lrth dist
           echo poetry publish -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
