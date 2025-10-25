@@ -115,9 +115,21 @@ jobs:
     needs: build_wheels
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Download distributions
+        uses: actions/download-artifact@v4
         with:
           path: dist
+
       - name: Upload to TestPyPI
         run: |
           pip install --upgrade pip poetry
@@ -128,7 +140,18 @@ jobs:
     needs: publish_testpypi
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Download distributions
+        uses: actions/download-artifact@v4
         with:
           path: dist
 
