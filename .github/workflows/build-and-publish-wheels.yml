@@ -121,7 +121,7 @@ jobs:
       - name: Upload to TestPyPI
         run: |
           pip install --upgrade pip poetry
-          poetry publish -r testpypi --no-build -u __token__ -p ${{ secrets.TESTPYPI_API_TOKEN }}
+          poetry publish -r testpypi -u __token__ -p ${{ secrets.TESTPYPI_API_TOKEN }}
 
   publish:
     name: Publish to PyPI
@@ -135,4 +135,4 @@ jobs:
       - name: Upload to PyPI
         run: |
           pip install --upgrade pip poetry
-          poetry publish --no-build -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
+          echo poetry publish -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
