@@ -7,7 +7,7 @@ custom classes and functions from C++ via [pybind11](https://github.com/pybind/p
 
 ## Prerequisites
 
-* Python >=3.7.3
+* Python >=3.9
 * A compiler with C++17 support
 * Ninja or Pip 10+
 * meson

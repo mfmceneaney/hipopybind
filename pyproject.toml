@@ -18,7 +18,7 @@ license = "MIT"
 classifiers = ["Programming Language :: Python :: 3"]
 
 [tool.poetry.dependencies]
-python = ">=3.8.0"
+python = ">=3.9"
 meson = ">=1.2"
 ninja = ">=1.8.2"
 pybind11 = ">=3.0.1"
