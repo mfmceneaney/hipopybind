@@ -30,12 +30,6 @@ poetry run ./install_hipo.sh
 pip install .
 ```
 
-And add the following to your startup script:
-
-```bash
-export PYTHONPATH=$PYTHONPATH\:/path/to/hipopybind
-```
-
 # :rocket: Getting Started
 
 Run the tutorials via:
