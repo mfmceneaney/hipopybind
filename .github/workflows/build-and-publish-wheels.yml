@@ -137,6 +137,7 @@ jobs:
           rm -rf dist
           mv dist_flat dist
           ls -lrth dist
+          poetry config repositories.testpypi https://test.pypi.org/legacy/
           poetry publish -r testpypi -u __token__ -p ${{ secrets.TESTPYPI_API_TOKEN }}
 
   publish:

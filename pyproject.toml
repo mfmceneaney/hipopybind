@@ -27,7 +27,3 @@ pybind11 = ">=3.0.1"
 pytest = "^8.0.0"
 clang-format = "^17.0.0"      # For local C++ formatting
 meson-python = "^0.18.0"
-
-[tool.poetry.repositories]
-pypi = { url = "https://upload.pypi.org/legacy/" }
-testpypi = { url = "https://test.pypi.org/legacy/" }
