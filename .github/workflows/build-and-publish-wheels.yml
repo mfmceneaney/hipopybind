@@ -63,34 +63,49 @@ jobs:
           cibuildwheel --output-dir dist
         env:
           CIBW_SKIP: "pp*"  # Skip PyPy if you like
+          MACOSX_DEPLOYMENT_TARGET: 15.0
 
-      - name: Patch RPATHs in wheel
+      - name: Patch RPATHs in built wheels
         run: |
-          WHEEL=$(ls dist/*.whl)
-          TMPDIR=dist_tmp
-          mkdir $TMPDIR
-          unzip "$WHEEL" -d "$TMPDIR"
-          
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            find "$TMPDIR/hipopybind" -type f -name "*.so*" -print0 | \
-              while IFS= read -r -d '' f; do
-                patchelf --print-rpath "$f"
-                patchelf --force-rpath --set-rpath '$ORIGIN/lib' "$f"
-                patchelf --print-rpath "$f"
-              done
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            find "$TMPDIR/hipopybind" -type f -name "*.so*" -print0 | \
-              while IFS= read -r -d '' f; do
-                otool -L "$f"
-                install_name_tool -add_rpath "@loader_path/lib" "$f"
-                otool -L "$f"
-              done
-          fi
+          TMPDIR_BASE="dist_tmp"
 
-          cd "$TMPDIR"
-          zip -r "../$WHEEL" .
-          cd ..
-          rm -rf $TPMDIR
+          for WHEEL in dist/*.whl; do
+            echo "🔧 Processing $WHEEL..."
+            TMPDIR="${TMPDIR_BASE}_$(basename "$WHEEL" .whl)"
+            mkdir -p "$TMPDIR"
+            unzip -q "$WHEEL" -d "$TMPDIR"
+
+            if [[ "$RUNNER_OS" == "Linux" ]]; then
+              echo "🔧 Adjusting RPATHs with patchelf..."
+              find "$TMPDIR/hipopybind" -type f -name "*.so*" -print0 | \
+                while IFS= read -r -d '' f; do
+                  echo "  → $f"
+                  patchelf --print-rpath "$f" || true
+                  patchelf --force-rpath --set-rpath '$ORIGIN/lib' "$f"
+                  patchelf --print-rpath "$f" || true
+                done
+
+            elif [[ "$RUNNER_OS" == "macOS" ]]; then
+              echo "🔧 Adjusting RPATHs with install_name_tool..."
+              find "$TMPDIR/hipopybind" -type f -name "*.so*" -print0 | \
+                while IFS= read -r -d '' f; do
+                  echo "  → $f"
+                  otool -L "$f"
+                  install_name_tool -add_rpath "@loader_path/lib" "$f"
+                  otool -L "$f"
+                done
+            fi
+
+            # Repack the modified wheel
+            echo "📦 Repacking $WHEEL"
+            cd "$TMPDIR"
+            zip -qr "../$(basename "$WHEEL")" .
+            cd - >/dev/null
+
+            # Clean up
+            rm -rf "$TMPDIR"
+            echo "✅ Finished $WHEEL"
+          done
 
       - name: Install package wheel
         run: |
