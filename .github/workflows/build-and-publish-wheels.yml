@@ -8,24 +8,18 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }} / Python ${{ matrix.python }}
+    name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           submodules: recursive
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
 
       - name: Install Poetry
         run: |
@@ -65,7 +59,10 @@ jobs:
 
       - name: Build package wheel
         run: |
-          poetry build
+          pip install cibuildwheel
+          cibuildwheel --output-dir dist
+        env:
+          CIBW_SKIP: "pp*"  # Skip PyPy if you like
 
       - name: Patch RPATHs in wheel
         run: |
