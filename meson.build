@@ -35,30 +35,38 @@ else
   pybind_rpath = '$ORIGIN/lib'
 endif
 
-# If no pkg-config is found
 if not libhipo_dep.found()
-  message('libhipo not found via pkg-config. Assuming ./install_hipo.sh has already been run...')
+  message('libhipo not found via pkg-config. Attempting to build from source...')
 
-  # Assume hipo is already installed locally in the source project
+  libhipo_src_dir = meson.project_source_root() / 'hipo'
+  libhipo_build_dir = meson.current_build_dir() / 'libhipo_build'
+  libhipo_install_dir = meson.project_source_root()
+
+  # Run meson setup
+  run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
+              '--prefix=' + libhipo_install_dir,
+              check: true)
+
+  # Compile and install
+  run_command('meson', 'compile', '-C', libhipo_build_dir, check: true)
+  run_command('meson', 'install', '-C', libhipo_build_dir, check: true)
+
+  # Assume libhipo_install_dir is a Meson File object or string path
+  hipo_include_dir = 'include'
+  hipo_lib_dir     = libhipo_install_dir / 'lib'
   hipo_lib_name    = 'hipo4'
-  hipo_include_dir = 'hipo' / hipo_lib_name
-  hipo_lib_dir     = meson.project_source_root() / 'lib'
-
+  install_subdir(
+    hipo_include_dir,
+    install_dir: hb_pkg_dir
+  )
+  install_subdir(
+    hipo_lib_dir,
+    install_dir: hb_pkg_dir
+  )
   libhipo_dep = declare_dependency(
     include_directories: include_directories(hipo_include_dir),
     link_args: ['-L' + hipo_lib_dir, '-l' + hipo_lib_name]
   )
-
-  # Install arbitrary data directory into the Python package
-  install_subdir(
-    'lib',
-    install_dir: hb_pkg_dir
-  )
-  install_subdir(
-    'include',
-    install_dir: hb_pkg_dir
-  )
-
 endif
 
 # ---- Build the Python extension ----
