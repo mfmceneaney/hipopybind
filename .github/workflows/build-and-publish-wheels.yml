@@ -42,7 +42,6 @@ jobs:
           pip install cibuildwheel
           cibuildwheel --output-dir dist
         env:
-          CIBW_SKIP: "pp*"  # Skip PyPy if you like
           MACOSX_DEPLOYMENT_TARGET: 15.0
 
       - name: Install package wheel
