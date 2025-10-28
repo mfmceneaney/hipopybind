@@ -24,7 +24,7 @@ pybind11_dep = dependency('pybind11', required: true)
 libhipo_dep = dependency('libhipo4', method: 'pkg-config', required: false)
 
 # ---- Set python install directory ----
-hb_pkg_dir = python.get_install_dir() / 'hipopybind'
+hb_pkg_dir = python.get_install_dir() / meson.project_name()
 
 # Set loader path
 host_os = host_machine.system()
