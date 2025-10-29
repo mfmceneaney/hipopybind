@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python: ["3.9", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - name: Checkout repository
@@ -43,58 +43,24 @@ jobs:
           echo "Checking C++ code formatting..."
           poetry run clang-format --dry-run --Werror $(find src/ -name '*.cpp' -o -name '*.hpp')
 
-      - name: Install patchelf (Linux only)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y patchelf binutils
-
-      - name: Ensure install_name_tool is available (macOS only)
-        if: runner.os == 'macOS'
-        run: |
-          # Make sure Xcode Command Line Tools are installed
-          xcode-select --install 2>/dev/null || true
-
-          # Verify install_name_tool and otool exist
-          which install_name_tool
-          which otool
-
       - name: Build package wheel
         run: |
           poetry build
 
       - name: Patch RPATHs in wheel
         run: |
-          WHEEL=$(ls dist/*.whl)
-          TMPDIR=dist_tmp
-          mkdir $TMPDIR
-          unzip "$WHEEL" -d "$TMPDIR"
-          
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            find "$TMPDIR/hipopybind" -type f -name "*.so*" -print0 | \
-              while IFS= read -r -d '' f; do
-                patchelf --print-rpath "$f"
-                patchelf --force-rpath --set-rpath '$ORIGIN/lib' "$f"
-                patchelf --print-rpath "$f"
-              done
+            pip install auditwheel
+            auditwheel repair -w repaired_dist/ dist/*.whl
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            find "$TMPDIR/hipopybind" -type f -name "*.so*" -print0 | \
-              while IFS= read -r -d '' f; do
-                otool -L "$f"
-                install_name_tool -add_rpath "@loader_path/lib" "$f"
-                otool -L "$f"
-              done
+            pip install delocate
+            delocate -w repaired_dist/ dist/*.whl
           fi
-
-          cd "$TMPDIR"
-          zip -r "../$WHEEL" .
-          cd ..
-          rm -rf $TPMDIR
 
       - name: Install package wheel
         run: |
-          ls -lrth dist
-          poetry run pip install dist/*.whl
+          ls -lrth repaired_dist
+          poetry run pip install repaired_dist/*.whl
 
       - name: Run tests
         run: |
