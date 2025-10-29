@@ -43,6 +43,7 @@ jobs:
           cibuildwheel --output-dir dist
         env:
           MACOSX_DEPLOYMENT_TARGET: 15.0
+          CIBW_SKIP: "cp36-* cp37-*"
 
       - name: Install package wheel
         run: |
