@@ -20,14 +20,27 @@ To install from PyPi run:
 pip install hipopybind
 ```
 
-To compile the library from source run the following:
+Compiling the library from source is **platform dependent**.
+
+On macos run:
+```bash
+git clone --recurse-submodules https://github.com/mfmceneaney/hipopybind.git
+cd hipopybind
+pip install poetry delocate
+poetry build
+delocate -w repaired_dist/ dist/*.whl
+pip install repaired_dist/*.whl
+```
+
+On linux run:
 
 ```bash
 git clone --recurse-submodules https://github.com/mfmceneaney/hipopybind.git
 cd hipopybind
-pip install poetry
-poetry run ./install_hipo.sh
-pip install .
+pip install poetry auditwheel
+poetry build
+auditwheel repair -w repaired_dist/ dist/*.whl
+pip install repaired_dist/*.whl
 ```
 
 # :rocket: Getting Started
