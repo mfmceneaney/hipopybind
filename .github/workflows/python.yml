@@ -54,7 +54,7 @@ jobs:
             auditwheel repair -w repaired_dist/ dist/*.whl
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
             pip install delocate
-            delocate -w repaired_dist/ dist/*.whl
+            delocate-wheel -w repaired_dist/ dist/*.whl
           fi
 
       - name: Install package wheel
