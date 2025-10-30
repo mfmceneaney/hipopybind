@@ -32,7 +32,7 @@ if host_os == 'darwin'
   pybind_rpath = '@loader_path/lib'
 else
   # Linux and others
-  pybind_rpath = '$ORIGIN/lib'
+  pybind_rpath = '$ORIGIN'
 endif
 
 if not libhipo_dep.found()
@@ -63,6 +63,16 @@ if not libhipo_dep.found()
     hipo_lib_dir,
     install_dir: hb_pkg_dir
   )
+  if host_os == 'darwin':
+    install_data(
+      hipo_include_dir / 'libhipo4.so',
+      install_dir: hb_pkg_dir
+    )
+    install_data(
+      hipo_include_dir / 'liblz4.1.so',
+      install_dir: hb_pkg_dir
+    )
+  endif
   libhipo_dep = declare_dependency(
     include_directories: include_directories(hipo_include_dir),
     link_args: ['-L' + hipo_lib_dir, '-l' + hipo_lib_name]
