@@ -28,7 +28,7 @@ git clone --recurse-submodules https://github.com/mfmceneaney/hipopybind.git
 cd hipopybind
 pip install poetry delocate
 poetry build
-delocate -w repaired_dist/ dist/*.whl
+delocate-wheel -w repaired_dist/ dist/*.whl
 pip install repaired_dist/*.whl
 ```
 
