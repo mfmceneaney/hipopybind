@@ -69,11 +69,14 @@ if not libhipo_dep.found()
       install_dir: hb_pkg_dir
     )
     run_command('ls', '-lrth', hipo_lib_dir)
-    install_data(
-      hipo_lib_dir / 'liblz4.so.1.9.4',
-      install_dir: hb_pkg_dir,
-      rename: 'liblz4.so'
-    )
+    lz4_path = hipo_lib_dir / 'liblz4.so.1.9.4'
+    if meson.is_file(lz4_path)
+      install_data(
+        lz4_path,
+        install_dir: hb_pkg_dir,
+        rename: 'liblz4.so'
+      )
+    endif
   endif
   libhipo_dep = declare_dependency(
     include_directories: include_directories(hipo_include_dir),
