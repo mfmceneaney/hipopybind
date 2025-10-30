@@ -13,6 +13,7 @@ project(
 
 # meson modules
 pkg = import('pkgconfig')
+fs = import('fs')
 
 #---------- Find python ----------#
 python = import('python').find_installation(pure: false)
@@ -70,7 +71,7 @@ if not libhipo_dep.found()
     )
     run_command('ls', '-lrth', hipo_lib_dir)
     lz4_path = hipo_lib_dir / 'liblz4.so.1.9.4'
-    if meson.is_file(lz4_path)
+    if fs.is_file(lz4_path)
       install_data(
         lz4_path,
         install_dir: hb_pkg_dir,
