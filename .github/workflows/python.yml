@@ -7,14 +7,14 @@ on:
 
 jobs:
   test:
-    name: python-${{ matrix.python }}
+    name: python-${{ matrix.python }}-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python: ["3.8"]
+        python: ["3.9"]
 
     steps:
       - name: Checkout repository
