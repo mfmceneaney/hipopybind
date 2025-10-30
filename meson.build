@@ -40,7 +40,7 @@ if not libhipo_dep.found()
 
   libhipo_src_dir = meson.project_source_root() / 'hipo'
   libhipo_build_dir = meson.current_build_dir() / 'libhipo_build'
-  libhipo_install_dir = meson.current_source_dir() / 'libhipo_install'
+  libhipo_install_dir = meson.current_source_dir()
 
   # Run meson setup
   run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
@@ -53,7 +53,7 @@ if not libhipo_dep.found()
 
   # Assume libhipo_install_dir is a Meson File object or string path
   hipo_include_dir = 'include'
-  hipo_lib_dir     = libhipo_install_dir / 'lib'
+  hipo_lib_dir     = meson.current_source_dir() / 'lib'
   hipo_lib_name    = 'hipo4'
   install_subdir(
     hipo_include_dir,
