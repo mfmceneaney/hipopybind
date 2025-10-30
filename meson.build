@@ -68,6 +68,7 @@ if not libhipo_dep.found()
       hipo_lib_dir / 'libhipo4.so',
       install_dir: hb_pkg_dir
     )
+    run_command('ls', '-lrth', hipo_lib_dir)
     install_data(
       hipo_lib_dir / 'liblz4.so.1.9.4',
       install_dir: hb_pkg_dir,
