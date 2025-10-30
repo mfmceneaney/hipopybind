@@ -65,11 +65,11 @@ if not libhipo_dep.found()
   )
   if host_os != 'darwin'
     install_data(
-      hipo_include_dir / 'libhipo4.so',
+      hipo_lib_dir / 'libhipo4.so',
       install_dir: hb_pkg_dir
     )
     install_data(
-      hipo_include_dir / 'liblz4.1.so',
+      hipo_lib_dir / 'liblz4.1.so',
       install_dir: hb_pkg_dir
     )
   endif
