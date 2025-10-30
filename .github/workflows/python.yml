@@ -7,8 +7,8 @@ on:
 
 jobs:
   test:
-    name: python-${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    name: python-${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
@@ -25,7 +25,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
 
       - name: Install Poetry
         run: |
@@ -51,7 +51,7 @@ jobs:
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             pip install auditwheel
-            auditwheel dist/*.whl
+            auditwheel show dist/*.whl
             pwd
             auditwheel repair -w repaired_dist/ dist/*.whl
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
