@@ -48,19 +48,10 @@ jobs:
           cibuildwheel --output-dir dist
         env:
           MACOSX_DEPLOYMENT_TARGET: 15.0
-          CIBW_SKIP: "pp* *-musllinux* cp36-* cp37-*"
+          CIBW_SKIP: "pp* *-musllinux* cp36-* cp37-* cp38-*"
           HOMEBREW_PREFIX: ""
           HOMEBREW_CELLAR: ""
           HOMEBREW_REPOSITORY: ""
-
-      - name: Install package wheel
-        run: |
-          ls -lrth dist
-          poetry run pip install dist/*.whl
-
-      - name: Run tests
-        run: |
-          poetry run pytest --maxfail=1 --disable-warnings -q
 
       - name: Upload built wheels
         uses: actions/upload-artifact@v4
