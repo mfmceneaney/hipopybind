@@ -102,18 +102,11 @@ endif
 # Install the python init script so your python installation can find the package
 install_data('src/__init__.py', install_dir: hb_pkg_dir)
 
-# Set link args to include GNU libstdc++ and libgcc on linux
-link_args = []
-if host_os != 'darwin'
-  link_args += ['-static-libstdc++', '-static-libgcc']
-endif
-
 # Compile the shared module
 pybind_module = shared_module('_core',
   'src/hipopybind_module.cpp',
   dependencies: [pybind11_dep, libhipo_dep],
   cpp_args: ['-DVERSION_INFO="@0@"'.format(meson.project_version())],
-  link_args: link_args,
   install: true,
   install_dir: hb_pkg_dir,
   install_rpath: pybind_rpath,
