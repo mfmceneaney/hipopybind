@@ -25,12 +25,6 @@ cpu_family = 'x86_64'
 cpu = 'x86_64'
 endian = 'little'
 
-[target_machine]
-system = 'darwin'
-cpu_family = 'x86_64'
-cpu = 'x86_64'
-endian = 'little'
-
 [build_machine]
 system = 'darwin'
 cpu_family = 'arm64'
