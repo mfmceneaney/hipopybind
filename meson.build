@@ -51,10 +51,12 @@ if not libhipo_dep.found()
     run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
                 '--prefix=' + libhipo_install_dir,
                 '--cross-file', 'cross_x86_64_macos.txt',
+                env: environment(),
                 check: true)
   else
     run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
                 '--prefix=' + libhipo_install_dir,
+                env: environment(),
                 check: true)
   endif
 
