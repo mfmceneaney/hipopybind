@@ -6,7 +6,7 @@ c = 'clang'
 cpp = 'clang++'
 ar = 'ar'
 strip = 'strip'
-pkg-config = 'pkg-config'
+pkgconfig = '/bin/true'  # disables pkg-config lookups
 
 [properties]
 # Tell Meson we’re cross-compiling for macOS x86_64
