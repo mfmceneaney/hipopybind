@@ -1,7 +1,7 @@
 project(
     'hipopybind',
     'cpp',
-    version: '2.0.1',
+    version: '1.9.9',
     license: 'MIT',
     meson_version: '>=1.2',
     default_options: [
@@ -105,6 +105,7 @@ pybind_module = shared_module('_core',
   'src/hipopybind_module.cpp',
   dependencies: [pybind11_dep, libhipo_dep],
   cpp_args: ['-DVERSION_INFO="@0@"'.format(meson.project_version())],
+  link_args: ['-static-libstdc++', '-static-libgcc'],
   install: true,
   install_dir: hb_pkg_dir,
   install_rpath: pybind_rpath,
