@@ -46,8 +46,6 @@ if not libhipo_dep.found()
   # Run meson setup with workaround for macos x86_64 architecture if you are building on arm64
   macos_arch = get_option('macos_arch')
   message('macos_arch = @0@'.format(macos_arch))
-  env_cmd = run_command('printenv', env: environment(), check: true)
-  message('Current environment:\n' + env_cmd.stdout())
   if host_os == 'darwin' and macos_arch == 'x86_64'
     message('Building for macos_arch==x86_64')
     run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
@@ -100,12 +98,22 @@ if not libhipo_dep.found()
 endif
 
 # ---- Build the Python extension ----
+
+# Install the python init script so your python installation can find the package
 install_data('src/__init__.py', install_dir: hb_pkg_dir)
+
+# Set link args to include GNU libstdc++ and libgcc on linux
+link_args = []
+if host_os != 'darwin'
+  link_args += ['-static-libstdc++', '-static-libgcc']
+endif
+
+# Compile the shared module
 pybind_module = shared_module('_core',
   'src/hipopybind_module.cpp',
   dependencies: [pybind11_dep, libhipo_dep],
   cpp_args: ['-DVERSION_INFO="@0@"'.format(meson.project_version())],
-  link_args: ['-static-libstdc++', '-static-libgcc'],
+  link_args: link_args,
   install: true,
   install_dir: hb_pkg_dir,
   install_rpath: pybind_rpath,
