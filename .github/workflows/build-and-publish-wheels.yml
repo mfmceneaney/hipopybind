@@ -48,10 +48,8 @@ jobs:
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             cibuildwheel --output-dir dist --platform linux
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            export MESON_ARGS="-Dmacos_arch=x86_64"
-            cibuildwheel --output-dir dist --platform macos --archs x86_64
-            export MESON_ARGS="-Dmacos_arch=arm64"
-            cibuildwheel --output-dir dist --platform macos --archs arm64
+            CIBW_ENVIRONMENT="MESON_ARGS='-Dmacos_arch=x86_64'" cibuildwheel --output-dir dist --platform macos --archs x86_64
+            CIBW_ENVIRONMENT="MESON_ARGS='-Dmacos_arch=arm64'" cibuildwheel --output-dir dist --platform macos --archs arm64
           fi
         env:
           MACOSX_DEPLOYMENT_TARGET: '15.0'
