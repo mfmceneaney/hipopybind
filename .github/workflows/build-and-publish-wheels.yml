@@ -58,6 +58,7 @@ jobs:
           HOMEBREW_CELLAR: ""
           HOMEBREW_REPOSITORY: ""
           PKG_CONFIG_PATH: ""
+          CIBW_ENVIRONMENT: "HOMEBREW_PREFIX='' HOMEBREW_CELLAR='' HOMEBREW_REPOSITORY='' PKG_CONFIG_PATH=''"
 
       - name: Upload built wheels
         uses: actions/upload-artifact@v4
