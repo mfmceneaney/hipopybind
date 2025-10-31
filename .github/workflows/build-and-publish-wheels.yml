@@ -49,6 +49,9 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: 15.0
           CIBW_SKIP: "pp* *-musllinux* cp36-* cp37-*"
+          HOMEBREW_PREFIX: ""
+          HOMEBREW_CELLAR: ""
+          HOMEBREW_REPOSITORY: ""
 
       - name: Install package wheel
         run: |
