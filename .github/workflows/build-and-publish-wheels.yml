@@ -47,6 +47,8 @@ jobs:
           pip install cibuildwheel
           cibuildwheel --output-dir dist
         env:
+          CIBW_ARCHS_MACOS: "universal2"
+          MACOSX_DEPLOYMENT_TARGET: '15.0'
           CIBW_SKIP: "pp* *-musllinux* cp36-* cp37-* cp38-*"
           HOMEBREW_PREFIX: ""
           HOMEBREW_CELLAR: ""
