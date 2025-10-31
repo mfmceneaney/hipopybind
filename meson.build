@@ -44,9 +44,16 @@ if not libhipo_dep.found()
   libhipo_install_dir = meson.project_source_root()
 
   # Run meson setup
-  run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
-              '--prefix=' + libhipo_install_dir,
-              check: true)
+  if host_os == 'darwin' and get_option('macos_arch') == 'x86_64'
+    run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
+                '--prefix=' + libhipo_install_dir,
+                '--cross-file cross_x86_64_macos.txt',
+                check: true)
+  else
+    run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
+                '--prefix=' + libhipo_install_dir,
+                check: true)
+  endif
 
   # Compile and install
   run_command('meson', 'compile', '-C', libhipo_build_dir, check: true)
