@@ -43,9 +43,11 @@ if not libhipo_dep.found()
   libhipo_build_dir = meson.current_build_dir() / 'libhipo_build'
   libhipo_install_dir = meson.project_source_root()
 
-  # Run meson setup
+  # Run meson setup with workaround for macos x86_64 architecture if you are building on arm64
   macos_arch = get_option('macos_arch')
   message('macos_arch = @0@'.format(macos_arch))
+  env_cmd = run_command('printenv', env: environment(), check: true)
+  message('Current environment:\n' + env_cmd.stdout())
   if host_os == 'darwin' and macos_arch == 'x86_64'
     message('Building for macos_arch==x86_64')
     run_command('meson', 'setup', libhipo_build_dir, libhipo_src_dir,
@@ -81,7 +83,7 @@ if not libhipo_dep.found()
       hipo_lib_dir / 'libhipo4.so',
       install_dir: hb_pkg_dir
     )
-    run_command('ls', '-lrth', hipo_lib_dir)
+    run_command('ls', '-lrth', hipo_lib_dir, check: true)
     lz4_path = hipo_lib_dir / 'liblz4.so.1.9.4'
     if fs.is_file(lz4_path)
       install_data(
