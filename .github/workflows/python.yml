@@ -50,14 +50,11 @@ jobs:
       - name: Patch RPATHs in wheel
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
-            pip install auditwheel
-            auditwheel show dist/*.whl
-            pwd
+            pip install auditwheel patchelf
             auditwheel repair -w repaired_dist/ dist/*.whl
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
             pip install delocate
             delocate-listdeps dist/*.whl
-            pwd
             delocate-wheel -w repaired_dist/ dist/*.whl
           fi
 
