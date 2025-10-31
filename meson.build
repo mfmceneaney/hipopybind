@@ -87,13 +87,16 @@ endif
 
 # ---- Build the Python extension ----
 install_data('src/__init__.py', install_dir: hb_pkg_dir)
-pybind_module = python.extension_module('_core',
+pybind_module = shared_module('_core',
   'src/hipopybind_module.cpp',
   dependencies: [pybind11_dep, libhipo_dep],
   cpp_args: ['-DVERSION_INFO="@0@"'.format(meson.project_version())],
   install: true,
   install_dir: hb_pkg_dir,
   install_rpath: pybind_rpath,
+  build_rpath: pybind_rpath,
+  link_args: ['-Wl,-rpath,'+pybind_rpath],
+  name_prefix: '',
 )
 
 # Export a dependency object for use as a subproject
