@@ -45,9 +45,13 @@ jobs:
       - name: Build package wheel
         run: |
           pip install cibuildwheel
-          cibuildwheel --output-dir dist
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            cibuildwheel --output-dir dist --platform linux
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            cibuildwheel --output-dir dist --platform macos --archs arm64
+            cibuildwheel --output-dir dist --platform macos --archs x86_64
+          fi
         env:
-          CIBW_ARCHS_MACOS: "universal2"
           MACOSX_DEPLOYMENT_TARGET: '15.0'
           CIBW_SKIP: "pp* *-musllinux* cp36-* cp37-* cp38-*"
           HOMEBREW_PREFIX: ""
