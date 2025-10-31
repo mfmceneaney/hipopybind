@@ -95,7 +95,6 @@ pybind_module = shared_module('_core',
   install_dir: hb_pkg_dir,
   install_rpath: pybind_rpath,
   build_rpath: pybind_rpath,
-  link_args: ['-Wl,-rpath,'+pybind_rpath],
   name_prefix: '',
   name_suffix: 'so',
 )
