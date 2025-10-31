@@ -97,6 +97,7 @@ pybind_module = shared_module('_core',
   build_rpath: pybind_rpath,
   link_args: ['-Wl,-rpath,'+pybind_rpath],
   name_prefix: '',
+  name_suffix: 'so',
 )
 
 # Export a dependency object for use as a subproject
