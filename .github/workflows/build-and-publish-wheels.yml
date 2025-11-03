@@ -1,6 +1,7 @@
 name: Build and Publish Wheels
 
 on:
+  branches: ['main']
   push:
     tags:
       - "v*"  # Build & publish on version tags (e.g. v1.2.3)
@@ -127,4 +128,4 @@ jobs:
           rm -rf dist
           mv dist_flat dist
           ls -lrth dist
-          echo poetry publish -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
+          poetry publish -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
