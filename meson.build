@@ -1,7 +1,7 @@
 project(
     'hipopybind',
     'cpp',
-    version: '1.9.9',
+    version: '1.9.10',
     license: 'MIT',
     meson_version: '>=1.2',
     default_options: [

@@ -1,4 +1,4 @@
 import hipopybind as m
 
 def test_main():
-    assert m.__version__ == "1.9.9"
+    assert m.__version__ == "1.9.10"
