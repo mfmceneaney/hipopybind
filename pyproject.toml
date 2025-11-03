@@ -1,25 +1,29 @@
 [build-system]
 requires = [
-    "setuptools>61.0",
-    "wheel",
-    "ninja",
-    "cmake>=3.15",
+    "meson>=1.2",
+    "meson-python",
+    "pybind11",
+    "ninja>=1.8.2"
 ]
-build-backend = "setuptools.build_meta"
+build-backend = 'mesonpy'
 
-[tool.isort]
-profile = "black"
+[tool.poetry]
+name = "hipopybind"
+version = "2.0.1"
+description = "Python bindings for hipo using pybind11"
+authors = ["Matthew McEneaney <matthew.mceneaney@duke.edu>"]
+repository = "https://github.com/mfmceneaney/hipopybind.git"
+readme = "README.md"
+license = "MIT"
+classifiers = ["Programming Language :: Python :: 3"]
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
-xfail_strict = true
-filterwarnings = ["error"]
-testpaths = ["tests"]
+[tool.poetry.dependencies]
+python = ">=3.9"
+meson = ">=1.2"
+ninja = ">=1.8.2"
+pybind11 = ">=3.0.1"
 
-[tool.cibuildwheel]
-test-command = "pytest {project}/tests"
-test-extras = ["test"]
-test-skip = ["*universal2:arm64"]
-# Setuptools bug causes collision between pypy and cpython artifacts
-before-build = "rm -rf {project}/build"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+clang-format = "^17.0.0"      # For local C++ formatting
+meson-python = "^0.18.0"

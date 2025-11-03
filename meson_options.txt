@@ -1,0 +1,7 @@
+option('build_type', type: 'combo', choices: ['debug', 'release'], value: 'release')
+option(
+  'macos_arch',
+  type: 'string',
+  value: '',
+  description: 'Target macOS architecture (arm64 or x86_64)'
+)

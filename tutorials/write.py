@@ -60,7 +60,7 @@ for i in range(nevents):
     b.setRows(nrows)
     for name in names:
         values = np.random.random(size=(nrows,))
-        b.putDoubles(name,values)
+        hb.putDoubles(b,name,values)
 
     # Show bank data
     print("Iteration",i)

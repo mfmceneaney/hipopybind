@@ -1,13 +1,19 @@
 #  HipopyBind : HIPO PyBind11 Library
+[![PyPI](https://img.shields.io/pypi/v/hipopybind.svg)](https://pypi.org/project/hipopybind/)
+[![Python](https://github.com/mfmceneaney/hipopybind/actions/workflows/python.yml/badge.svg)](https://github.com/mfmceneaney/hipopybind/actions/workflows/python.yml)
+
+This project exposes in python the [hipo](https://github.com/gavalian/hipo) classes and a few
+custom classes and functions from C++ via [pybind11](https://github.com/pybind/pybind11).
 
 ## Prerequisites
 
-* Python >=3.7.3
-* A compiler with C++11 support
-* Pip 10+ or CMake >= 3.15 (or 3.14+ on Windows, which was the first version to support VS 2019)
+* macos or linux, windows is **not** supported
+* Python >=3.9
+* A compiler with C++17 support
 * Ninja or Pip 10+
+* meson
 
-## Installation
+## :green_circle: Installation
 
 To install from PyPi run:
 
@@ -15,27 +21,41 @@ To install from PyPi run:
 pip install hipopybind
 ```
 
-To compile the library from source run the following:
+Compiling the library from source is **platform dependent**.
+
+On macos run:
+```bash
+git clone --recurse-submodules https://github.com/mfmceneaney/hipopybind.git
+cd hipopybind
+pip install poetry delocate
+poetry build
+delocate-wheel -w repaired_dist/ dist/*.whl
+pip install repaired_dist/*.whl
+```
+
+On linux run:
 
 ```bash
 git clone --recurse-submodules https://github.com/mfmceneaney/hipopybind.git
 cd hipopybind
-cmake .
-make
+pip install poetry auditwheel
+poetry build
+auditwheel repair -w repaired_dist/ dist/*.whl
+pip install repaired_dist/*.whl
 ```
 
-And add the following to your startup script:
+# :rocket: Getting Started
 
+Run the tutorials via:
 ```bash
-export PYTHONPATH=$PYTHONPATH\:/path/to/hipopybind
+python3 tutorials/write.py
+python3 tutorials/read.py
 ```
 
-# Developer Note
-For updating submodules run the following:
-
-```bash
-git submodule update --init --recursive
-```
+# :red_circle: Troubleshooting
+If you run into import errors because of undefined symbols when using the project along
+with cppyy python libraries, try importing this library first since symbol visibility set to
+hidden during compilation.
 
 #
 
