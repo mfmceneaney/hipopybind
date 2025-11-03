@@ -52,6 +52,11 @@ python3 tutorials/write.py
 python3 tutorials/read.py
 ```
 
+# :red_circle: Troubleshooting
+If you run into import errors because of undefined symbols when using the project along
+with cppyy python libraries, try importing this library first since symbol visibility set to
+hidden during compilation.
+
 #
 
 Contact: matthew.mceneaney@duke.edu
