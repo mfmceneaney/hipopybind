@@ -9,7 +9,7 @@ build-backend = 'mesonpy'
 
 [tool.poetry]
 name = "hipopybind"
-version = "1.9.10"
+version = "2.0.1"
 description = "Python bindings for hipo using pybind11"
 authors = ["Matthew McEneaney <matthew.mceneaney@duke.edu>"]
 repository = "https://github.com/mfmceneaney/hipopybind.git"
