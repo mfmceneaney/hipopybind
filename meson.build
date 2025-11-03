@@ -62,17 +62,12 @@ if not libhipo_dep.found()
 
   # Compile and install
   run_command('meson', 'compile', '-C', libhipo_build_dir, check: true)
-  hipo_install_target = run_command('meson', 'install', '-C', libhipo_build_dir, check: true)
+  run_command('meson', 'install', '-C', libhipo_build_dir, check: true)
 
   # Assume libhipo_install_dir is a Meson File object or string path
   hipo_include_dir = 'include'
-  lib_dir          = 'lib'
-  hipo_lib_dir     = libhipo_install_dir / lib_dir
+  hipo_lib_dir     = libhipo_install_dir / 'lib'
   hipo_lib_name    = 'hipo4'
-  lz4_lib_name     = 'lz4'
-  new_hipo_lib_name = hipo_lib_name + 'pybind11'
-
-  # Install include directory
   install_subdir(
     hipo_include_dir,
     install_dir: hb_pkg_dir
@@ -81,40 +76,24 @@ if not libhipo_dep.found()
     hipo_lib_dir,
     install_dir: hb_pkg_dir
   )
-
-  # Set file extension
-  file_ext = '.dylib'
   if host_os != 'darwin'
-    file_ext = '.so'
-  endif
-
-  # Copy hipo4 into main directory and rename to avoid loading conflicts
-  # if another library loads libhipo4 from another place
-  hipo4_path = join_paths(hipo_lib_dir, 'lib'+hipo_lib_name+file_ext)
-  new_hipo_lib_fname = 'lib'+new_hipo_lib_name+file_ext
-  new_hipo4_path = hipo_lib_dir / new_hipo_lib_fname
-  rename_libhipo4 = custom_target(
-    'rename_libhipo4',
-    input : hipo4_path,   # the built library
-    output: new_hipo_lib_fname,         # just a filename, no directories
-    command: ['mv', '@INPUT@', '@OUTPUT@'],
-    build_by_default: true,
-    install_dir: host_os=='darwin' ? hb_pkg_dir / 'lib' : hb_pkg_dir ,
-  )
-
-  # Copy lz4 into main directory if it exists
-  lz4_path = join_paths(hipo_lib_dir, 'lib'+lz4_lib_name+file_ext+'.1.9.4')
-  if fs.is_file(lz4_path)
     install_data(
-      lz4_path,
+      hipo_lib_dir / 'libhipo4.so',
       install_dir: hb_pkg_dir
     )
+    run_command('ls', '-lrth', hipo_lib_dir, check: true)
+    lz4_path = hipo_lib_dir / 'liblz4.so.1.9.4'
+    if fs.is_file(lz4_path)
+      install_data(
+        lz4_path,
+        install_dir: hb_pkg_dir,
+        rename: 'liblz4.so'
+      )
+    endif
   endif
-
-  # Declare hipo dependency
   libhipo_dep = declare_dependency(
     include_directories: include_directories(hipo_include_dir),
-    link_args: ['-L' + hipo_lib_dir, '-l'+new_hipo_lib_name, '-rpath', pybind_rpath],
+    link_args: ['-L' + hipo_lib_dir, '-l' + hipo_lib_name]
   )
 endif
 
@@ -123,11 +102,23 @@ endif
 # Install the python init script so your python installation can find the package
 install_data('src/__init__.py', install_dir: hb_pkg_dir)
 
+# Set link args based on os
+py_mod_link_args = []
+if host_os == 'darwin'
+  py_mod_link_args += ['-Wl,-exported_symbol,_PyInit__core'] # explicitly export python module init function
+else
+  py_mod_link_args += ['-Wl,--exclude-libs,ALL'] # don't re-export linked libs
+endif
+
 # Compile the shared module
 pybind_module = shared_module('_core',
   'src/hipopybind_module.cpp',
   dependencies: [pybind11_dep, libhipo_dep],
-  cpp_args: ['-DVERSION_INFO="@0@"'.format(meson.project_version())],
+  cpp_args: [
+    '-DVERSION_INFO="@0@"'.format(meson.project_version()),
+    '-fvisibility=hidden'
+  ], # hide all internal symbols
+  link_args: py_mod_link_args,
   install: true,
   install_dir: hb_pkg_dir,
   install_rpath: pybind_rpath,
